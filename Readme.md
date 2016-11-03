@@ -1,0 +1,1 @@
+simple Model for the easy creation mysql queries.

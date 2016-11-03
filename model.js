@@ -5,7 +5,9 @@ const util = require('util')
 
 const Field = require('./field')
 
-const db_config = require('../../lib/config')
+const internals = {
+  db_config: {}
+}
 
 /**
 @class Model
@@ -27,10 +29,10 @@ function Model(table,cfg, dbname){
   this.modelConfig = cfg || {}
   this.action = '';
   this.actionData = [];
-  this.redis = require('../redconn');
+  // this.redis = require('../redconn');
   this.table = table;
   this.dbname = dbname || 'db';
-  this.dbConfig = db_config[this.dbname];
+  this.dbConfig = internals.db_config[this.dbname];
   this.squel = require('squel');
   this.df = require('dateformat');
   this.strftime = function(v,format){
@@ -39,7 +41,7 @@ function Model(table,cfg, dbname){
   this.df.i18n = i18n();
   this.squel.useFlavour('mysql');
   this.dbConn = require('./db');
-  this.connection = this.base = new this.dbConn( this.dbConfig, db_config.debug && db_config.debug.models )
+  this.connection = this.base = new this.dbConn( this.dbConfig, internals.db_config.debug && internals.db_config.debug.models )
 
   this.logs = []
 
@@ -49,9 +51,6 @@ function Model(table,cfg, dbname){
     console.log(`model ${this.dbname}.${this.table} error `,this.logs.join(':'))
     console.log('****************************************************************\r\n')
   }.bind(this)
-
-  // this.escape = this.base.escape
-  // this.escapeId = this.base.escapeId
 
   this.squel.registerValueHandler(Date, function(date) {
     return date.getFullYear() + '-' + date.getMonth() + '-' + date.getDate() + ' ' + date.getHours()+':'+date.getMinutes()+':'+date.getSeconds();
@@ -89,6 +88,16 @@ function i18n(){
     })
 
 */
+
+
+Model.setConfig = function(cfg){
+  internals.db_config = cfg;
+}
+
+Model.setRedis = function(redis){
+  internals.redis = redis;
+}
+
 Model.prototype.do = function(opts){
 
   opts = opts || {}
@@ -141,10 +150,9 @@ Model.prototype.export = function (ids){
 }
 
 Model.prototype.queueChanges = function queueChanges(data){
-  // if(!this.redis.online){
-  //   console.error('redis offline...')
-  //   return
-  // }
+  if(!this.redis){
+    return
+  }
   let rec = {
     table: this.table,
     db: this.dbConfig.database,

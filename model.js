@@ -3,7 +3,7 @@
 const co = require('co')
 const util = require('util')
 
-const Field = require('./field')
+const Field = require('./lib/field')
 
 const internals = {
   db_config: {}
@@ -26,6 +26,9 @@ var Item = new model('items')
 
 */
 function Model(table,cfg, dbname){
+  if(!internals.db_config){
+    return this
+  }
   this.modelConfig = cfg || {}
   this.action = '';
   this.actionData = [];
@@ -40,7 +43,7 @@ function Model(table,cfg, dbname){
   }
   this.df.i18n = i18n();
   this.squel.useFlavour('mysql');
-  this.dbConn = require('./db');
+  this.dbConn = require('./lib/db');
   this.connection = this.base = new this.dbConn( this.dbConfig, internals.db_config.debug && internals.db_config.debug.models )
 
   this.logs = []

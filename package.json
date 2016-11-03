@@ -19,6 +19,10 @@
   ],
   "homepage": "https://bitbucket.org/leto1394/model#Readme.md",
   "dependencies": {
-    "dateformat": "^1.0.12"
+    "co": "^4.6.0",
+    "dateformat": "^1.0.12",
+    "mysql": "^2.12.0",
+    "pluralize": "^3.0.0",
+    "squel": "^5.5.0"
   }
 }

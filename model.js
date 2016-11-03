@@ -32,7 +32,7 @@ function Model(table,cfg, dbname){
   this.modelConfig = cfg || {}
   this.action = '';
   this.actionData = [];
-  // this.redis = require('../redconn');
+  this.redis = internals.redis;
   this.table = table;
   this.dbname = dbname || 'db';
   this.dbConfig = internals.db_config[this.dbname];

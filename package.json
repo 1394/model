@@ -1,0 +1,26 @@
+{
+  "name": "@dmitri.leto/model",
+  "version": "1.0.0",
+  "description": "mysql table model class. help build sql with squel module",
+  "main": "model.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@bitbucket.org/leto1394/model.git"
+  },
+  "keywords": [
+    "mysql",
+    "model"
+  ],
+  "author": "dmitri.leto",
+  "license": "ISC",
+  "homepage": "https://bitbucket.org/leto1394/model#readme",
+  "dependencies": {
+    "co": "^4.6.0",
+    "mysql": "^2.12.0",
+    "pluralize": "^3.0.0",
+    "squel": "^5.5.0"
+  }
+}

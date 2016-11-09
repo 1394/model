@@ -137,7 +137,7 @@ Model.prototype.do = function(opts) {
 
         })
         .then(data => {
-          if(this,modelConfig.queueChanges){
+          if(this.modelConfig.queueChanges){
             this.queueChanges(data)
           }
           return data;

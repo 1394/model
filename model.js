@@ -6,7 +6,8 @@ const util = require('util')
 const Field = require('./lib/field')
 
 const internals = {
-    db_config: {}
+    db_config: {},
+    version: require('./package').version
 }
 
 /**
@@ -98,7 +99,11 @@ Model.setConfig = function(cfg) {
 }
 
 Model.getPool = function() {
-    return this.base.pool
+    return this.base.getPool()
+}
+
+Model.version = function() {
+    return internals.version
 }
 
 Model.setRedis = function(redis) {

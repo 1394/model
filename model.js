@@ -35,8 +35,8 @@ function Model(table, cfg, dbname) {
     this.actionData = [];
     this.redis = internals.redis;
     this.table = table;
-    this.dbname = dbname || 'db';
-    this.dbConfig = internals.db_config[this.dbname];
+    this.dbname = dbname || internals.db_config.default;
+    // this.dbConfig = internals.db_config[this.dbname];
     this.squel = require('squel');
     this.df = require('dateformat');
     this.strftime = function(v, format) {
@@ -45,7 +45,7 @@ function Model(table, cfg, dbname) {
     this.df.i18n = i18n();
     this.squel.useFlavour('mysql');
     this.dbConn = require('./lib/db');
-    this.base = new this.dbConn(this.dbConfig, internals.db_config.debug && internals.db_config.debug.models)
+    this.base = this.dbConn( internals.db_config, internals.db_config.debug)
 
     this.logs = []
 
@@ -95,11 +95,11 @@ function i18n() {
 
 
 Model.setConfig = function(cfg) {
-    internals.db_config = cfg;
+  internals.db_config = cfg;
 }
 
-Model.getPool = function() {
-    return this.base.getPool()
+Model.getPool = function(db) {
+  return this.base.getPool(db)
 }
 
 Model.version = function() {
@@ -122,17 +122,17 @@ Model.prototype.do = function(opts) {
                 var result = { paginate: true }
                 var totalSql = me.query.clone().field('COUNT(*) as count').toString()
                 var query = me.query.limit(me.paginate.limit).offset(me.paginate.offset).toString()
-                var data = yield me.base.do(totalSql)
+                var data = yield me.base.do(totalSql,me.dbname)
                 result.count = data[0].count
                 result.pages = Math.ceil(result.count / me.paginate.limit)
-                data = yield me.base.do(query)
+                data = yield me.base.do(query,me.dbname)
                 if (opts.fields && typeof opts.fields === 'object' && opts.fields.length) {
                     data = me.processFields( data, opts.fields)
                 }
                 result.rows = data;
                 return result;
             }
-            data = yield me.base.do(me.query.toString())
+            data = yield me.base.do(me.query.toString(),me.dbname)
             if (opts.fields && typeof opts.fields === 'object' && opts.fields.length && Array.isArray(data)) {
                 data = me.processFields( data, opts.fields)
             }
@@ -169,7 +169,7 @@ Model.prototype.queueChanges = function queueChanges(data) {
     }
     let rec = {
         table: this.table,
-        db: this.dbConfig.database,
+        db: this.dbname,
         dbname: this.dbname,
         action: this.action,
         actionData: this.actionData
@@ -215,10 +215,10 @@ Model.prototype.end = function(opts) {
                 var result = { paginate: true }
                 var totalSql = me.query.clone().field('COUNT(*) as count').toString()
                 var query = me.query.limit(me.paginate.limit).offset(me.paginate.offset).toString()
-                var data = yield me.base.do(totalSql)
+                var data = yield me.base.do(totalSql,me.dbname)
                 result.count = data[0].count
                 result.pages = Math.ceil(result.count / me.paginate.limit)
-                data = yield me.base.do(query)
+                data = yield me.base.do(query,me.dbname)
 
                 // instance Field
                 if (util.isArray(data)) {
@@ -234,7 +234,7 @@ Model.prototype.end = function(opts) {
                 result.rows = data;
                 return result;
             }
-            data = yield me.base.do(me.query.toString())
+            data = yield me.base.do(me.query.toString(),me.dbname)
 
             // instance Field
             if (util.isArray(data)) {
@@ -662,7 +662,7 @@ Model.prototype.findById = function(id) {
 Model.prototype.getFields = function() {
     return this.base.do({
         sql: `SHOW COLUMNS FROM ${this.table}`
-    })
+    },me.dbname)
 }
 
 module.exports = Model;

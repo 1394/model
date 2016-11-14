@@ -10,6 +10,8 @@ const internals = {
     version: require('./package').version
 }
 
+const db = require('./lib/db');
+
 /**
 @class Model
 обеспечивает интерфейс запросов к БД
@@ -44,8 +46,9 @@ function Model(table, cfg, dbname) {
     }
     this.df.i18n = i18n();
     this.squel.useFlavour('mysql');
-    this.dbConn = require('./lib/db');
-    this.base = this.dbConn( internals.db_config, internals.db_config.debug)
+    // this.dbConn = require('./lib/db');
+
+    this.base = internals.base;
 
     this.logs = []
 
@@ -96,6 +99,7 @@ function i18n() {
 
 Model.setConfig = function(cfg) {
   internals.db_config = cfg;
+  internals.base = db( internals.db_config, internals.db_config.debug)
 }
 
 Model.getPool = function(db) {

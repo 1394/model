@@ -666,7 +666,7 @@ Model.prototype.findById = function(id) {
 Model.prototype.getFields = function() {
     return this.base.do({
         sql: `SHOW COLUMNS FROM ${this.table}`
-    },me.dbname)
+    },this.dbname)
 }
 
 module.exports = Model;

@@ -10,7 +10,7 @@ const internals = {
     version: require('./package').version
 }
 
-const db = require('./lib/db');
+const db = new require('./lib/db');
 
 /**
 @class Model

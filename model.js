@@ -35,7 +35,11 @@ function Model(table, cfg, dbname) {
   this.actionData = [];
   this.redis = internals.redis;
   this.table = table;
-  this.dbname = dbname || 'db';
+  this.dbname = dbname || internals.default_db_name;
+  if(!this.dbname){
+    throw new Error('cant make model w/o database name');
+    return
+  }
   this.dbConfig = internals.db_config[this.dbname];
   this.squel = require('squel');
   this.df = require('dateformat');
@@ -99,6 +103,9 @@ Model.setConfig = function(cfg) {
   Object.keys(cfg).forEach(key=>{
     if( cfg[key] && cfg[key].database && cfg[key].database.length ){
       internals.db_config[ cfg[key].database ] = cfg[key];
+      if(cfg[key].default){
+        internals.default_db_name = cfg[key].database;
+      }
     }
   })
 }

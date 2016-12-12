@@ -96,7 +96,11 @@ function i18n() {
 
 
 Model.setConfig = function(cfg) {
-  internals.db_config = cfg;
+  Object.keys(cfg).forEach(key=>{
+    if( cfg[key] && cfg[key].database && cfg[key].database.length ){
+      internals.db_config[ cfg[key].database ] = cfg[key];
+    }
+  })
 }
 
 Model.getPool = function() {

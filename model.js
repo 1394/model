@@ -105,8 +105,10 @@ Model.setConfig = function(cfg) {
       internals.db_config[ cfg[key].database ] = cfg[key];
       if(cfg[key].default){
         internals.default_db_name = cfg[key].database;
+        console.log('default_db_name = ',internals.default_db_name)
       }else{
         internals.default_db_name = cfg[ Object.keys(cfg)[0] ].database;
+        console.log('default_db_name = ',internals.default_db_name)
       }
     }
   })

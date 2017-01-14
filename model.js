@@ -37,6 +37,9 @@ function Model (table, cfg, dbname) {
   this.table = table
   this.dbname = dbname || internals.default_db_name
   if (!this.dbname) {
+    console.log('default_db_name = ',internals.default_db_name)
+    console.log('db_config = ')
+    console.dir(internals.db_config,{depth: Infinity})
     throw new Error('cant make model w/o database name')
   }
   this.dbConfig = internals.db_config[this.dbname]

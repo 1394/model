@@ -26,7 +26,7 @@ var Item = new model('items')
 @param {Array} cfg.fields - array of fields, for example : [{ name: 'webname', hide: true, convert: function(v){return 'site name : '+v} }]
 
 */
-function Model (table, cfg, dbname) {
+function Model (table, cfg = {}, dbname) {
   if (!internals.db_config) {
     return this
   }
@@ -51,7 +51,7 @@ function Model (table, cfg, dbname) {
   this.df.i18n = i18n()
   this.squel.useFlavour('mysql')
   this.DbConn = require('./lib/db')
-  this.base = new this.DbConn(this.dbConfig, internals.db_config.debug && internals.db_config.debug.models)
+  this.base = new this.DbConn(this.dbConfig, internals.db_config.debug && internals.db_config.debug.models || cfg.debug)
 
   this.logs = []
 

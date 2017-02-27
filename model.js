@@ -26,7 +26,7 @@ var Item = new model('items')
 @param {Array} cfg.fields - array of fields, for example : [{ name: 'webname', hide: true, convert: function(v){return 'site name : '+v} }]
 
 */
-function Model (table, cfg, dbname) {
+function Model (table, cfg = {}, dbname) {
   if (!internals.db_config) {
     return this
   }
@@ -51,7 +51,7 @@ function Model (table, cfg, dbname) {
   this.df.i18n = i18n()
   this.squel.useFlavour('mysql')
   this.DbConn = require('./lib/db')
-  this.base = new this.DbConn(this.dbConfig, internals.db_config.debug && internals.db_config.debug.models)
+  this.base = new this.DbConn(this.dbConfig, internals.db_config.debug && internals.db_config.debug.models || cfg.debug)
 
   this.logs = []
 
@@ -136,6 +136,7 @@ Model.prototype.do = function (opts) {
   opts = opts || {}
   opts.fields = opts.fields || this.modelConfig.fields
   var me = this
+  var requestString = ''
 
   return co(function*() {
     var data
@@ -153,7 +154,9 @@ Model.prototype.do = function (opts) {
       result.rows = data
       return result
     }
-    data = yield me.base.do(me.query.toString())
+    requestString = me.query.toString()
+    let params = me.query.toParam()
+    data = yield me.base.do({sql: params.text,values: params.values})
     if (opts.fields && typeof opts.fields === 'object' && opts.fields.length && Array.isArray(data)) {
       data = me.processFields(data, opts.fields)
     }
@@ -168,7 +171,9 @@ Model.prototype.do = function (opts) {
       return data
     })
     .catch(err => {
-      console.error('model.do error : ', err)
+      let msg = err + ' : ' + requestString
+      throw msg
+      // console.error('model.do error : ', err)
     })
 }
 

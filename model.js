@@ -701,7 +701,7 @@ Model.prototype.getFields = function () {
 */
 Model.prototype.addColumn = function (fieldSql) {
   return this.base.do({
-    sql: `ALTER ${this.table} ADD ${fieldSql}`
+    sql: `ALTER \`${this.table}\` ADD ${fieldSql}`
   })
 }
 

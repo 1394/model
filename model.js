@@ -355,14 +355,17 @@ Model.prototype.find = function (table, fields) {
 ATTENTION!!! - method {@link Model.do} return Object but not Array
 pagination setup
 @method Model.page
-@param {Number} page=1
-@param {Number} [limit=20]
-@param {Object} opts
+@param {Number} [page=1] set page
+@param {Number} [limit=20] set limit
+@param {Object} page set params in object
+@param {Object} page.page set page
+@param {Object} page.offset set offset !!! will override page param
+@param {Object} page.limit set limit
 */
-Model.prototype.page = function (page, limit, opts) {
+Model.prototype.page = function (page, limit) {
   let offset
   if (typeof page === 'object') {
-    opts = page
+    let opts = page
     page = opts.page
     limit = opts.limit
     offset = opts.offset

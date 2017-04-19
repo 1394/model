@@ -360,9 +360,19 @@ pagination setup
 @param {Object} opts
 */
 Model.prototype.page = function (page, limit, opts) {
+  let offset
+  if (typeof page === 'object') {
+    opts = page
+    page = opts.page
+    limit = opts.limit
+    offset = opts.offset
+  }
   this.logs.push('page')
   if (page < 1) page = 1
-  this.paginate = { offset: (page - 1) * limit, limit: limit || 20 }
+  this.paginate = {
+    offset: offset || ((page - 1) * limit),
+    limit: limit || 20
+  }
   return this
 }
 

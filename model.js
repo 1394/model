@@ -703,11 +703,13 @@ Model.prototype.findById = function (id) {
 /**
 @method Model.upsert
 */
-Model.prototype.upsert = function (fieldsData) {
+Model.prototype.upsert = function (...opts) {
+  let fieldsData = opts.shift()
+  let me = this
   return this.doFirst()
     .then(rec => {
       if (rec) {
-        return this.update().setFields(fieldsData).do()
+        return this.update().when.apply(me, opts).setFields(fieldsData).do()
       } else {
         return this.insert().setFields(fieldsData).do()
       }

@@ -1,6 +1,6 @@
 {
   "name": "@dmitri.leto/model",
-  "version": "0.2.01d",
+  "version": "0.2.01e",
   "description": "simple Model for the easy creation mysql queries",
   "main": "model.js",
   "scripts": {

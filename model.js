@@ -706,7 +706,7 @@ Model.prototype.findById = function (id) {
 Model.prototype.upsert = function (...opts) {
   let fieldsData = opts.shift()
   let me = this
-  return this.doFirst()
+  return this.find().where(opts).doFirst()
     .then(rec => {
       if (rec) {
         return this.update().when.apply(me, opts).setFields(fieldsData).do()

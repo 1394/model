@@ -701,7 +701,16 @@ Model.prototype.findById = function (id) {
 }
 
 /**
+## [starter method] - this method must be first at chain because is initialized inner 'squel' var
 @method Model.upsert
+@param {Object} fieldSet hash keys as field names and values
+@param {} whereArguments arguments for where , when find and next update/insert operation
+@return {Promise}
+@example
+  SomeTable.upsert({name: 'somename'}, 'kind = ?', 'car')
+    .then(data => {
+      console.log(data.insertId || data.affectedRows)
+    })
 */
 Model.prototype.upsert = function (...opts) {
   let fieldsData = opts.shift()

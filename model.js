@@ -703,7 +703,7 @@ Model.prototype.findById = function (id) {
 /**
 @method Model.upsert
 */
-Model.prototype.upsert = function (where,fieldsData) {
+Model.prototype.upsert = function (fieldsData) {
   return this.doFirst()
     .then(rec => {
       if (rec) {

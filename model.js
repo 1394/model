@@ -709,7 +709,7 @@ Model.prototype.upsert = function (...opts) {
   return me.find().where.apply(me, opts).doFirst()
     .then(rec => {
       if (rec) {
-        return me.update().when.apply(me, opts).setFields(fieldsData).do()
+        return me.update().where.apply(me, opts).setFields(fieldsData).do()
       } else {
         return me.insert().setFields(fieldsData).do()
       }

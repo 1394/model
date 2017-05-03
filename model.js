@@ -718,4 +718,13 @@ Model.prototype.addColumn = function (fieldSql) {
   })
 }
 
+/**
+@method Model.exists
+*/
+Model.prototype.exists = function (table) {
+  return this.base.do({
+    sql: `SHOW TABLES LIKE \`${this.table}\``
+  })
+}
+
 module.exports = Model

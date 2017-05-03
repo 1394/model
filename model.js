@@ -701,6 +701,20 @@ Model.prototype.findById = function (id) {
 }
 
 /**
+@method Model.upsert
+*/
+Model.prototype.upsert = function (where,fieldsData) {
+  return this.doFirst()
+    .then(rec => {
+      if (rec) {
+        return this.update().setFields(fieldsData).do()
+      } else {
+        return this.insert().setFields(fieldsData).do()
+      }
+    })
+}
+
+/**
 @method Model.getFields
 */
 Model.prototype.getFields = function () {
@@ -710,7 +724,7 @@ Model.prototype.getFields = function () {
 }
 
 /**
-@method Model.getFields
+@method Model.addColumn
 */
 Model.prototype.addColumn = function (fieldSql) {
   return this.base.do({

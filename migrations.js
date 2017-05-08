@@ -59,6 +59,7 @@ class Migrations {
       columns = [columns]
     }
     this.cfg.columns = columns.map(internals.prepareColumn)
+    return this
   }
 
   async create (options) {
@@ -77,7 +78,7 @@ class Migrations {
     }
     cfg.columns = '(' + this.cfg.columns.join(',') + ')'
     let result = await this.Table.base.do(`CREATE IF NOT EXISTS \`${this.cfg.tableName}\` ${cfg.like} ${cfg.columns} ENGINE=${cfg.engine} DEFAULT CHARSET=${cfg.charset}`).catch(e => { me.error(e); throw e })
-    return result
+    return this
   }
 
   async drop (ignoreExistance) {
@@ -95,6 +96,7 @@ class Migrations {
         throw e
       }
     }
+    return this
   }
 
   error (e) {

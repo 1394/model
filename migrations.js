@@ -90,23 +90,16 @@ class Migrations {
     options.columns = options.columns || []
     var me = this
     var cfg = {
-      exists: await this.Table.exists(),
-      engine: options.engine || 'InnoDB',
-      charset: options.charset || 'utf8'
+      exists: await this.Table.exists()
     }
     if (!cfg.exists) {
       throw new Error('error while migration : table ' + this.cfg.tableName + ' not exist')
-    }
-    if (options.like && options.like.length) {
-      cfg.like = await this.Table.exists(options.like)
-      cfg.like = cfg.like ? `LIKE \`${options.like}\`` : ''
     }
     if (!Array.isArray(options.columns)) {
       options.columns = [options.columns]
     }
     cfg.columns = options.columns.map(internals.prepareColumn)
-    cfg.columns = options.columns.join(' ')
-    let sql = `ALTER TABLE \`${this.cfg.tableName}\` ${cfg.columns}`
+    let sql = `ALTER TABLE \`${this.cfg.tableName}\` ${cfg.columns.join(' ')}`
     if (options.verbose) {
       console.log(sql)
     }

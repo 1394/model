@@ -77,7 +77,11 @@ class Migrations {
       cfg.like = cfg.like ? `LIKE \`${options.like}\`` : ''
     }
     cfg.columns = '(' + this.cfg.columns.join(',') + ')'
-    let result = await this.Table.base.do(`CREATE IF NOT EXISTS \`${this.cfg.tableName}\` ${cfg.like} ${cfg.columns} ENGINE=${cfg.engine} DEFAULT CHARSET=${cfg.charset}`).catch(e => { me.error(e); throw e })
+    let sql = `CREATE IF NOT EXISTS \`${this.cfg.tableName}\` ${cfg.like} ${cfg.columns} ENGINE=${cfg.engine} DEFAULT CHARSET=${cfg.charset}`
+    if (options.verbose) {
+      console.log(sql)
+    }
+    let result = await this.Table.base.do(sql).catch(e => { me.error(e); throw e })
     return this
   }
 

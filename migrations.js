@@ -81,7 +81,7 @@ class Migrations {
     if (options.verbose) {
       console.log(sql)
     }
-    this.result = await this.Table.base.do(sql).catch(e => { me.error(e); throw e })
+    this.result = await this.Table.base.do(sql).catch(e => { me.error(e); throw e }).then((res) => { console.log(`DONE CREATE ${me.cfg.tableName}`); return res })
     return this
   }
 
@@ -103,7 +103,7 @@ class Migrations {
     if (options.verbose) {
       console.log(sql)
     }
-    this.result = await this.Table.base.do(sql).catch(e => { me.error(e); throw e })
+    this.result = await this.Table.base.do(sql).catch(e => { me.error(e); throw e }).then((res) => { console.log(`DONE ALTER ${me.cfg.tableName}`); return res })
     return this
   }
 
@@ -113,7 +113,7 @@ class Migrations {
       exists: await this.Table.exists()
     }
     if (cfg.exists) {
-      this.result = await this.Table.base.do(`DROP TABLE \`${this.cfg.tableName}\``).catch(e => { me.error(e); throw e })
+      this.result = await this.Table.base.do(`DROP TABLE \`${this.cfg.tableName}\``).catch(e => { me.error(e); throw e }).then((res) => { console.log(`DONE DROP ${me.cfg.tableName}`); return res })
     } else {
       let e = new Error(`table ${this.cfg.tableName} not exist`)
       this.error(e)

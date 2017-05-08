@@ -746,7 +746,7 @@ Model.prototype.addColumn = function (fieldSql) {
 /**
 @method Model.exists
 */
-Model.prototype.exists = function (table) {
+Model.prototype.exists = function () {
   return this.base.do({
     sql: `SHOW TABLES LIKE '${this.table}'`
   }).then(rows => rows[0])

@@ -70,6 +70,8 @@ function Model (table, cfg = {}, dbname) {
   return this
 };
 
+function Model.migrate = () => require('./migrations')
+
 function i18n () {
   return {
     dayNames: ['вс', 'пн', 'вт', 'ср', 'чт', 'пт', 'сб', 'воскресенье', 'понедельник', 'вторник', 'среда', 'четверг', 'пятница', 'суббота'],

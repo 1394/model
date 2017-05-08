@@ -70,7 +70,7 @@ function Model (table, cfg = {}, dbname) {
   return this
 };
 
-function Model.migrate = () => require('./migrations')
+Model.migrate = () => require('./migrations')
 
 function i18n () {
   return {

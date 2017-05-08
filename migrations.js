@@ -63,6 +63,7 @@ class Migrations {
   }
 
   async create (options) {
+    options = options || {}
     var me = this
     var cfg = {
       exists: await this.Table.exists(),
@@ -87,6 +88,7 @@ class Migrations {
   }
 
   async alter (options) {
+    options = options || {}
     var me = this
     var cfg = {
       exists: await this.Table.exists(),
@@ -100,7 +102,7 @@ class Migrations {
       cfg.like = await this.Table.exists(options.like)
       cfg.like = cfg.like ? `LIKE \`${options.like}\`` : ''
     }
-    cfg.columns = '(' + this.cfg.columns.join(',') + ')'
+    cfg.columns = this.cfg.columns.join(',')
     let sql = `ALTER TABLE \`${this.cfg.tableName}\` ${cfg.columns}`
     if (options.verbose) {
       console.log(sql)

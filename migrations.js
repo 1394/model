@@ -82,7 +82,30 @@ class Migrations {
     if (options.verbose) {
       console.log(sql)
     }
-    let result = await this.Table.base.do(sql).catch(e => { me.error(e); throw e })
+    this.result = await this.Table.base.do(sql).catch(e => { me.error(e); throw e })
+    return this
+  }
+
+  async alter (options) {
+    var me = this
+    var cfg = {
+      exists: await this.Table.exists(),
+      engine: options.engine || 'InnoDB',
+      charset: options.charset || 'utf8'
+    }
+    if (!cfg.exists) {
+      throw new Error('error while migration : table ' + this.cfg.tableName + ' not exist')
+    }
+    if (options.like && options.like.length) {
+      cfg.like = await this.Table.exists(options.like)
+      cfg.like = cfg.like ? `LIKE \`${options.like}\`` : ''
+    }
+    cfg.columns = '(' + this.cfg.columns.join(',') + ')'
+    let sql = `ALTER TABLE \`${this.cfg.tableName}\` ${cfg.columns}`
+    if (options.verbose) {
+      console.log(sql)
+    }
+    this.result = await this.Table.base.do(sql).catch(e => { me.error(e); throw e })
     return this
   }
 
@@ -92,8 +115,7 @@ class Migrations {
       exists: await this.Table.exists()
     }
     if (cfg.exists) {
-      let result = await this.Table.base.do(`DROP TABLE \`${this.cfg.tableName}\``).catch(e => { me.error(e); throw e })
-      return result
+      this.result = await this.Table.base.do(`DROP TABLE \`${this.cfg.tableName}\``).catch(e => { me.error(e); throw e })
     } else {
       let e = new Error(`table ${this.cfg.tableName} not exist`)
       this.error(e)

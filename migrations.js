@@ -64,7 +64,7 @@ class Migrations {
 
   async create (options) {
     var me = this
-    let cfg = {
+    var cfg = {
       exists: await this.cfg.tableName.exists(),
       engine: options.engine || 'InnoDB',
       charset: options.charset || 'utf8'
@@ -83,7 +83,7 @@ class Migrations {
 
   async drop (ignoreExistance) {
     var me = this
-    let cfg = {
+    var cfg = {
       exists: await this.cfg.tableName.exists()
     }
     if (cfg.exists) {
@@ -100,7 +100,8 @@ class Migrations {
   }
 
   error (e) {
-    console.error(`error while migrate ${this.cfg.tableName}`)
+    // console.error(`error while migrate ${this.cfg.tableName}`)
+    console.error(`error while migrate`)
     console.dir(e, {depth: Infinity})
   }
 }

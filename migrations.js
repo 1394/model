@@ -78,7 +78,7 @@ class Migrations {
       cfg.like = cfg.like ? `LIKE \`${options.like}\`` : ''
     }
     cfg.columns = '(' + this.cfg.columns.join(',') + ')'
-    let sql = `CREATE IF NOT EXISTS \`${this.cfg.tableName}\` ${cfg.like} ${cfg.columns} ENGINE=${cfg.engine} DEFAULT CHARSET=${cfg.charset}`
+    let sql = `CREATE TABLE IF NOT EXISTS \`${this.cfg.tableName}\` ${cfg.like} ${cfg.columns} ENGINE=${cfg.engine} DEFAULT CHARSET=${cfg.charset}`
     if (options.verbose) {
       console.log(sql)
     }

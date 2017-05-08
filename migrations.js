@@ -24,7 +24,9 @@ const internals = {
       field.notnull = field.options.notnull ? 'NOT NULL' : 'NULL'
       field.comment = field.comment || ''
       field.default = field.default || ''
+      field.op = field.op || ''
       return [
+        field.op,
         '`' + field.name + '`',
         field.type,
         field.notnull,
@@ -43,7 +45,6 @@ class Migrations {
   constructor (tableName) {
     this.Model = require('./model')
     this.cfg = {
-      columns: [],
       tableName: tableName
     }
 
@@ -54,16 +55,9 @@ class Migrations {
     return this
   }
 
-  columns (columns) {
-    if (!Array.isArray(columns)) {
-      columns = [columns]
-    }
-    this.cfg.columns = columns.map(internals.prepareColumn)
-    return this
-  }
-
   async create (options) {
     options = options || {}
+    options.columns = options.columns || []
     var me = this
     var cfg = {
       exists: await this.Table.exists(),
@@ -78,7 +72,11 @@ class Migrations {
       cfg.like = await this.Table.exists(options.like)
       cfg.like = cfg.like ? `LIKE \`${options.like}\`` : ''
     }
-    cfg.columns = '(' + this.cfg.columns.join(',') + ')'
+    if (!Array.isArray(options.columns)) {
+      options.columns = [options.columns]
+    }
+    cfg.columns = options.columns.map(internals.prepareColumn)
+    cfg.columns = '(' + cfg.columns.join(',') + ')'
     let sql = `CREATE TABLE IF NOT EXISTS \`${this.cfg.tableName}\` ${cfg.like} ${cfg.columns} ENGINE=${cfg.engine} DEFAULT CHARSET=${cfg.charset}`
     if (options.verbose) {
       console.log(sql)
@@ -89,6 +87,7 @@ class Migrations {
 
   async alter (options) {
     options = options || {}
+    options.columns = options.columns || []
     var me = this
     var cfg = {
       exists: await this.Table.exists(),
@@ -102,7 +101,11 @@ class Migrations {
       cfg.like = await this.Table.exists(options.like)
       cfg.like = cfg.like ? `LIKE \`${options.like}\`` : ''
     }
-    cfg.columns = this.cfg.columns.join(',')
+    if (!Array.isArray(options.columns)) {
+      options.columns = [options.columns]
+    }
+    cfg.columns = options.columns.map(internals.prepareColumn)
+    cfg.columns = options.columns.join(' ')
     let sql = `ALTER TABLE \`${this.cfg.tableName}\` ${cfg.columns}`
     if (options.verbose) {
       console.log(sql)

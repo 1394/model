@@ -6,10 +6,10 @@ const internals = {
       return '`id` int(11) NOT NULL AUTO_INCREMENT, PRIMARY KEY (`id`)'
     }
     if (typeof column === 'string' && column === 'created_at') {
-      return '`created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP'
+      return '`created_at` timestamp DEFAULT CURRENT_TIMESTAMP'
     }
     if (typeof column === 'string' && column === 'updated_at') {
-      return '`updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'
+      return '`updated_at` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'
     }
     if (typeof column === 'string' && column.length) {
       return column
@@ -21,7 +21,7 @@ const internals = {
         options: column.shift()
       }
       field.autoincrement = field.options.autoincrement ? 'AUTO_INCREMENT' : ''
-      field.notnull = field.options.notnull ? 'NOT NULL' : 'NULL'
+      field.notnull = field.options.notnull ? 'NOT NULL' : ''
       field.comment = field.comment || ''
       field.default = field.default || ''
       field.op = field.options.op || ''

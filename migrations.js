@@ -65,7 +65,7 @@ class Migrations {
   async create (options) {
     var me = this
     var cfg = {
-      exists: await this.cfg.tableName.exists(),
+      exists: await this.Table.exists(),
       engine: options.engine || 'InnoDB',
       charset: options.charset || 'utf8'
     }
@@ -84,7 +84,7 @@ class Migrations {
   async drop (ignoreExistance) {
     var me = this
     var cfg = {
-      exists: await this.cfg.tableName.exists()
+      exists: await this.Table.exists()
     }
     if (cfg.exists) {
       let result = await this.Table.base.do(`DROP TABLE \`${this.cfg.tableName}\``).catch(e => { me.error(e); throw e })

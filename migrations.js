@@ -24,7 +24,7 @@ const internals = {
       field.notnull = field.options.notnull ? 'NOT NULL' : 'NULL'
       field.comment = field.comment || ''
       field.default = field.default || ''
-      field.op = field.op || ''
+      field.op = field.options.op || ''
       return [
         field.op,
         '`' + field.name + '`',

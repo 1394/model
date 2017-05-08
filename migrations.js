@@ -67,7 +67,8 @@ class Migrations {
     var cfg = {
       exists: await this.Table.exists(),
       engine: options.engine || 'InnoDB',
-      charset: options.charset || 'utf8'
+      charset: options.charset || 'utf8',
+      like: ''
     }
     if (options.force && cfg.exists) {
       options.force = await this.Table.base.do(`DROP TABLE ${this.cfg.tableName}`).catch(e => { me.error(e); throw e })

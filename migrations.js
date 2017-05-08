@@ -42,13 +42,15 @@ const internals = {
 class Migrations {
   constructor (tableName) {
     this.Model = require('./model')
-    this.columns = []
+    this.cfg = {
+      columns: [],
+      tableName: tableName
+    }
 
-    if (!(tableName || '').length) {
+    if (!(this.cfg.tableName || '').length) {
       throw new Error('tableName cant be empty')
     }
-    this.tableName = tableName
-    this.Table = new this.Model(this.tableName)
+    this.Table = new this.Model(this.cfg.tableName)
     return this
   }
 
@@ -56,37 +58,38 @@ class Migrations {
     if (!Array.isArray(columns)) {
       columns = [columns]
     }
-    this.columns = columns.map(internals.prepareColumn)
+    this.cfg.columns = columns.map(internals.prepareColumn)
   }
 
   async create (options) {
     var me = this
     let cfg = {
-      exists: await this.tableName.exists(),
+      exists: await this.cfg.tableName.exists(),
       engine: options.engine || 'InnoDB',
       charset: options.charset || 'utf8'
     }
     if (options.force && cfg.exists) {
-      options.force = await this.Table.base.do(`DROP TABLE ${this.tableName}`).catch(e => { me.error(e); throw e })
+      options.force = await this.Table.base.do(`DROP TABLE ${this.cfg.tableName}`).catch(e => { me.error(e); throw e })
     }
     if (options.like && options.like.length) {
       cfg.like = await this.Table.exists(options.like)
+      cfg.like = cfg.like ? `LIKE \`${options.like}\`` : ''
     }
-    cfg.columns = '(' + this.columns.join(',') + ')'
-    let result = await this.Table.base.do(`CREATE IF NOT EXISTS \`${this.tableName}\` ${cfg.columns} ENGINE=${cfg.engine} DEFAULT CHARSET=${cfg.charset}`).catch(e => { me.error(e); throw e })
+    cfg.columns = '(' + this.cfg.columns.join(',') + ')'
+    let result = await this.Table.base.do(`CREATE IF NOT EXISTS \`${this.cfg.tableName}\` ${cfg.like} ${cfg.columns} ENGINE=${cfg.engine} DEFAULT CHARSET=${cfg.charset}`).catch(e => { me.error(e); throw e })
     return result
   }
 
   async drop (ignoreExistance) {
     var me = this
     let cfg = {
-      exists: await this.tableName.exists()
+      exists: await this.cfg.tableName.exists()
     }
     if (cfg.exists) {
-      let result = await this.Table.base.do(`DROP TABLE \`${this.tableName}\``).catch(e => { me.error(e); throw e })
+      let result = await this.Table.base.do(`DROP TABLE \`${this.cfg.tableName}\``).catch(e => { me.error(e); throw e })
       return result
     } else {
-      let e = new Error(`table ${this.tableName} not exist`)
+      let e = new Error(`table ${this.cfg.tableName} not exist`)
       this.error(e)
       if (!ignoreExistance) {
         throw e
@@ -95,7 +98,7 @@ class Migrations {
   }
 
   error (e) {
-    console.error(`error while migrate ${this.tableName}`)
+    console.error(`error while migrate ${this.cfg.tableName}`)
     console.dir(e, {depth: Infinity})
   }
 }

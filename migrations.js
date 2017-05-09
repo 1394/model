@@ -163,9 +163,9 @@ class Migrations {
     options = options || {}
     name = '`' + name + '`'
     if (options.notnull) {
-      if (!options.notnullDefault) {
-        throw new Error('cant add notnull while notnullDefault is empty')
-      }
+      // if (!options.notnullDefault) {
+      //   throw new Error('cant add notnull while notnullDefault is empty')
+      // }
       // let nullFields = await this.Table.find().field(`COUNT(${name}) as count`).field('id').where(`${name} IS NULL`).doFirst()
       // if (nullFields.count > 0) {
       //   let data = {}

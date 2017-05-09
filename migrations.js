@@ -150,7 +150,7 @@ class Migrations {
     if (options.autoincrement) {
       sql.push('AUTO_INCREMENT, ADD PRIMARY')
     }
-    this.setColumn(sql.join(' '))
+    this.setColumn(sql.filter(el => el).join(' '))
     return this
   }
 
@@ -192,7 +192,7 @@ class Migrations {
     if (options.autoincrement) {
       sql.push('AUTO_INCREMENT, ADD PRIMARY')
     }
-    this.setColumn(sql.join(' '))
+    this.setColumn(sql.filter(el => el).join(' '))
     return this
   }
 

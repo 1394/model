@@ -81,7 +81,12 @@ class Migrations {
     if (options.verbose) {
       console.log(sql)
     }
-    this.result = await this.Table.base.do(sql).catch(e => { me.error(e); throw e }).then((res) => { console.log(`DONE CREATE ${me.cfg.tableName}`); return res })
+    if (!options.fake) {
+      if (!options.verbose) {
+        console.log(sql)
+      }
+      this.result = await this.Table.base.do(sql).catch(e => { me.error(e); throw e }).then((res) => { console.log(`DONE CREATE ${me.cfg.tableName}`); return res })
+    }
     return this
   }
 
@@ -103,7 +108,12 @@ class Migrations {
     if (options.verbose) {
       console.log(sql)
     }
-    this.result = await this.Table.base.do(sql).catch(e => { me.error(e); throw e }).then((res) => { console.log(`DONE ALTER ${me.cfg.tableName}`); return res })
+    if (!options.fake) {
+      if (!options.verbose) {
+        console.log(sql)
+      }
+      this.result = await this.Table.base.do(sql).catch(e => { me.error(e); throw e }).then((res) => { console.log(`DONE ALTER ${me.cfg.tableName}`); return res })
+    }
     return this
   }
 

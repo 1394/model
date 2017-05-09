@@ -80,6 +80,9 @@ class Migrations {
       options.columns = [options.columns]
     }
     cfg.columns = options.columns.map(internals.prepareColumn)
+    if (!cfg.columns.length) {
+      cfg.columns = this.getColumns()
+    }
     cfg.columns = '(' + cfg.columns.join(',') + ')'
     let sql = `CREATE TABLE IF NOT EXISTS ${this.tableName()} ${cfg.like} ${cfg.columns} ENGINE=${cfg.engine} DEFAULT CHARSET=${cfg.charset} COLLATE=${cfg.collate}`
     if (options.verbose) {

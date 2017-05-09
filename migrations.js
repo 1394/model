@@ -127,6 +127,9 @@ class Migrations {
   }
 
   prepareColumn (name, type, options) {
+    if (typeof name === 'string' && !type && !options) {
+      return name
+    }
     options = options || {}
     name = '`' + name + '`'
     options.default = `DEFAULT ${options.default}` || ''
@@ -151,24 +154,6 @@ class Migrations {
   }
 
   addColumn (name, type, options) {
-    // options = options || {}
-    // name = '`' + name + '`'
-    // options.default = `DEFAULT ${options.default}` || ''
-    // options.update = options.update ? `ON UPDATE ${options.update}` : ''
-    // if (options.autoincrement) {
-    //   options.notnull = true
-    // }
-    // let sql = [
-    //   'ADD',
-    //   name,
-    //   type
-    // ]
-    // sql.push(options.notnull ? 'NOT NULL' : 'NULL')
-    // sql.push(options.default)
-    // sql.push(options.update)
-    // if (options.autoincrement) {
-    //   sql.push('AUTO_INCREMENT, ADD PRIMARY')
-    // }
     this.setColumn('ADD ' + this.prepareColumn(name, type, options))
     return this
   }
@@ -179,25 +164,6 @@ class Migrations {
   }
 
   modifyColumn (name, type, options) {
-    // options = options || {}
-    // name = '`' + name + '`'
-    // options.default = `DEFAULT ${options.default}` || ''
-    // options.update = options.update ? `ON UPDATE ${options.update}` : ''
-    // if (options.autoincrement) {
-    //   options.notnull = true
-    // }
-    // let sql = [
-    //   'MODIFY',
-    //   name,
-    //   type
-    // ]
-    // sql.push(options.notnull ? 'NOT NULL' : 'NULL')
-    // sql.push(options.default)
-    // sql.push(options.update)
-    // if (options.autoincrement) {
-    //   sql.push('AUTO_INCREMENT, ADD PRIMARY')
-    // }
-    // this.setColumn(sql.filter(el => el).join(' '))
     this.setColumn('MODIFY ' + this.prepareColumn(name, type, options))
     return this
   }

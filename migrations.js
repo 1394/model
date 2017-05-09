@@ -122,7 +122,7 @@ class Migrations {
   }
 
   addColumns (columns) {
-    columns.forEach(col => this.addColumn.apply(this, col))
+    columns.forEach(col => this.addColumn.apply(this, Array.isArray(col) ? col : [col]))
     return this
   }
 
@@ -159,7 +159,7 @@ class Migrations {
   }
 
   modifyColumns (columns) {
-    columns.forEach(col => this.modifyColumn.apply(this, col))
+    columns.forEach(col => this.modifyColumn.apply(this, Array.isArray(col) ? col : [col]))
     return this
   }
 
@@ -198,18 +198,3 @@ class Migrations {
 
 
 module.exports = Migrations
-
-/**
- *
- * const Migrations = require('@dmitri.leto/migrations')
- *
- * const Item = new Migrations('items')
- *
- * async function up () {
- *    await Item.columns([
- *      'id INT AUTO_INCREMENT PRIMARY KEY',
- *      'currency_guid VARCHAR(60)'
- *    ]).create({force: true, like: 'items2'}).catch(Item.error)
- * }
- *
- */

@@ -121,12 +121,12 @@ class Migrations {
     return this
   }
 
-  async addColumns (columns) {
+  addColumns (columns) {
     columns.forEach(col => this.addColumn.apply(this, col))
     return this
   }
 
-  async addColumn (name, type, options) {
+  addColumn (name, type, options) {
     name = '`' + name + '`'
     if (options.notnull) {
       options.notnull = 'NOT NULL'
@@ -153,23 +153,23 @@ class Migrations {
     return this
   }
 
-  async modifyColumns (columns) {
+  modifyColumns (columns) {
     columns.forEach(col => this.modifyColumn.apply(this, col)).join(',')
     return this
   }
 
-  async modifyColumn (name, type, options) {
+  modifyColumn (name, type, options) {
     name = '`' + name + '`'
     if (options.notnull) {
       if (!options.notnullDefault) {
         throw new Error('cant add notnull while notnullDefault is empty')
       }
-      let nullFields = await this.Table.find().field(`COUNT(${name}) as count`).field('id').where(`${name} IS NULL`).doFirst()
-      if (nullFields.count > 0) {
-        let data = {}
-        data[name] = options.notnullDefault
-        await this.Table.update().where(`${name} IS NULL`).setFields(data).do()
-      }
+      // let nullFields = await this.Table.find().field(`COUNT(${name}) as count`).field('id').where(`${name} IS NULL`).doFirst()
+      // if (nullFields.count > 0) {
+      //   let data = {}
+      //   data[name] = options.notnullDefault
+      //   await this.Table.update().where(`${name} IS NULL`).setFields(data).do()
+      // }
       options.notnull = 'NOT NULL'
     } else {
       options.notnull = 'NULL'

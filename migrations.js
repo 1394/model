@@ -164,7 +164,11 @@ class Migrations {
   }
 
   modifyColumn (name, type, options) {
-    this.setColumn('MODIFY ' + this.prepareColumn(name, type, options))
+    if (name && !type && !options) {
+      this.setColumn(this.prepareColumn(name, type, options))
+    } else {
+      this.setColumn('MODIFY ' + this.prepareColumn(name, type, options))
+    }
     return this
   }
 

@@ -81,7 +81,8 @@ class Migrations {
     }
     cfg.columns = options.columns.map(internals.prepareColumn)
     if (!cfg.columns.length) {
-      cfg.columns = this.getColumns()
+// TODO : need refactoring
+      cfg.columns = this.getColumns().map(el => { el = el.split(' '); el.shift(); return el.join(' ') })
     }
     cfg.columns = '(' + cfg.columns.join(',') + ')'
     let sql = `CREATE TABLE IF NOT EXISTS ${this.tableName()} ${cfg.like} ${cfg.columns} ENGINE=${cfg.engine} DEFAULT CHARSET=${cfg.charset} COLLATE=${cfg.collate}`

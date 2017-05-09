@@ -42,7 +42,7 @@ const internals = {
 }
 
 class Migrations {
-  constructor (table) {
+  constructor (table, options) {
     let tableName = table || ''
     this.tableName = function (raw) {
       return raw ? tableName : '`' + tableName + '`'
@@ -51,7 +51,7 @@ class Migrations {
       throw new Error('tableName cant be empty')
     }
     this.Model = require('./model')
-    this.Table = new this.Model(this.tableName(true))
+    this.Table = new this.Model(this.tableName(true), options)
     return this
   }
 

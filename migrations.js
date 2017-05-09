@@ -42,16 +42,16 @@ const internals = {
 }
 
 class Migrations {
-  constructor (tableName) {
-    this.Model = require('./model')
-    this.cfg = {
-      tableName: tableName
+  constructor (table) {
+    let tableName = table || ''
+    this.tableName = function (raw) {
+      return raw ? tableName : '`' + tableName + '`'
     }
-
-    if (!(this.cfg.tableName || '').length) {
+    if (!(this.tableName(true)).length) {
       throw new Error('tableName cant be empty')
     }
-    this.Table = new this.Model(this.cfg.tableName)
+    this.Model = require('./model')
+    this.Table = new this.Model(this.tableName(true))
     return this
   }
 
@@ -66,7 +66,7 @@ class Migrations {
       like: ''
     }
     if (options.force && cfg.exists) {
-      options.force = await this.Table.base.do(`DROP TABLE ${this.cfg.tableName}`).catch(e => { me.error(e); throw e })
+      options.force = await this.Table.base.do(`DROP TABLE ${this.tableName()}`).catch(e => { me.error(e); throw e })
     }
     if (options.like && options.like.length) {
       cfg.like = await this.Table.exists(options.like)
@@ -77,7 +77,7 @@ class Migrations {
     }
     cfg.columns = options.columns.map(internals.prepareColumn)
     cfg.columns = '(' + cfg.columns.join(',') + ')'
-    let sql = `CREATE TABLE IF NOT EXISTS \`${this.cfg.tableName}\` ${cfg.like} ${cfg.columns} ENGINE=${cfg.engine} DEFAULT CHARSET=${cfg.charset}`
+    let sql = `CREATE TABLE IF NOT EXISTS ${this.tableName()} ${cfg.like} ${cfg.columns} ENGINE=${cfg.engine} DEFAULT CHARSET=${cfg.charset}`
     if (options.verbose) {
       console.log(sql)
     }
@@ -85,7 +85,7 @@ class Migrations {
       if (!options.verbose) {
         console.log(sql)
       }
-      this.result = await this.Table.base.do(sql).catch(e => { me.error(e); throw e }).then((res) => { console.log(`DONE CREATE ${me.cfg.tableName}`); return res })
+      this.result = await this.Table.base.do(sql).catch(e => { me.error(e); throw e }).then((res) => { console.log(`DONE CREATE ${me.tableName()}`); return res })
     }
     return this
   }
@@ -98,13 +98,13 @@ class Migrations {
       exists: await this.Table.exists()
     }
     if (!cfg.exists) {
-      throw new Error('error while migration : table ' + this.cfg.tableName + ' not exist')
+      throw new Error('error while migration : table ' + this.tableName(true) + ' not exist')
     }
     if (!Array.isArray(options.columns)) {
       options.columns = [options.columns]
     }
     cfg.columns = options.columns.map(internals.prepareColumn)
-    let sql = `ALTER TABLE \`${this.cfg.tableName}\` ${cfg.columns.join(' ')}`
+    let sql = `ALTER TABLE ${this.tableName()} ${cfg.columns.join(' ')}`
     if (options.verbose) {
       console.log(sql)
     }
@@ -112,9 +112,13 @@ class Migrations {
       if (!options.verbose) {
         console.log(sql)
       }
-      this.result = await this.Table.base.do(sql).catch(e => { me.error(e); throw e }).then((res) => { console.log(`DONE ALTER ${me.cfg.tableName}`); return res })
+      this.result = await this.Table.base.do(sql).catch(e => { me.error(e); throw e }).then((res) => { console.log(`DONE ALTER ${me.tableName()}`); return res })
     }
     return this
+  }
+
+  async addColumn (name, type, options) {
+    let sql = `ALTER TABLE ${this.tableName()}`
   }
 
   async drop (ignoreExistance) {
@@ -123,9 +127,9 @@ class Migrations {
       exists: await this.Table.exists()
     }
     if (cfg.exists) {
-      this.result = await this.Table.base.do(`DROP TABLE \`${this.cfg.tableName}\``).catch(e => { me.error(e); throw e }).then((res) => { console.log(`DONE DROP ${me.cfg.tableName}`); return res })
+      this.result = await this.Table.base.do(`DROP TABLE ${this.tableName()}`).catch(e => { me.error(e); throw e }).then((res) => { console.log(`DONE DROP ${me.tableName()}`); return res })
     } else {
-      let e = new Error(`table ${this.cfg.tableName} not exist`)
+      let e = new Error(`table ${this.tableName()} not exist`)
       this.error(e)
       if (!ignoreExistance) {
         throw e
@@ -135,7 +139,6 @@ class Migrations {
   }
 
   error (e) {
-    // console.error(`error while migrate ${this.cfg.tableName}`)
     console.error(`error while migrate`)
     console.dir(e, {depth: Infinity})
   }

@@ -155,7 +155,7 @@ class Migrations {
   }
 
   modifyColumns (columns) {
-    columns.forEach(col => this.modifyColumn.apply(this, col)).join(',')
+    columns.forEach(col => this.modifyColumn.apply(this, col))
     return this
   }
 

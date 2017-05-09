@@ -129,11 +129,6 @@ class Migrations {
   addColumn (name, type, options) {
     options = options || {}
     name = '`' + name + '`'
-    if (options.notnull) {
-      options.notnull = 'NOT NULL'
-    } else {
-      options.notnull = 'NULL'
-    }
     options.default = `DEFAULT ${options.default}` || ''
     options.update = options.update ? `ON UPDATE ${options.update}` : ''
     if (options.autoincrement) {
@@ -162,20 +157,6 @@ class Migrations {
   modifyColumn (name, type, options) {
     options = options || {}
     name = '`' + name + '`'
-    if (options.notnull) {
-      // if (!options.notnullDefault) {
-      //   throw new Error('cant add notnull while notnullDefault is empty')
-      // }
-      // let nullFields = await this.Table.find().field(`COUNT(${name}) as count`).field('id').where(`${name} IS NULL`).doFirst()
-      // if (nullFields.count > 0) {
-      //   let data = {}
-      //   data[name] = options.notnullDefault
-      //   await this.Table.update().where(`${name} IS NULL`).setFields(data).do()
-      // }
-      options.notnull = 'NOT NULL'
-    } else {
-      options.notnull = 'NULL'
-    }
     options.default = `DEFAULT ${options.default}` || ''
     options.update = options.update ? `ON UPDATE ${options.update}` : ''
     if (options.autoincrement) {

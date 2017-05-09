@@ -145,7 +145,7 @@ class Migrations {
       sql.push('AUTO_INCREMENT PRIMARY KEY')
     }
     if (options.comment) {
-      sql.push('COMMENT ' + options.comment)
+      sql.push(`COMMENT '${options.comment}'`)
     }
     return sql.filter(el => el).join(' ')
   }

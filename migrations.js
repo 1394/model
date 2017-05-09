@@ -52,6 +52,9 @@ class Migrations {
     }
     this.Model = require('./model')
     this.Table = new this.Model(this.tableName(true), options)
+    let columns = []
+    this.setColumn = function (col) { columns.push(col) }
+    this.getColumns = function () { return columns }
     return this
   }
 
@@ -63,6 +66,7 @@ class Migrations {
       exists: await this.Table.exists(),
       engine: options.engine || 'InnoDB',
       charset: options.charset || 'utf8',
+      collate: options.collate || 'utf8_unicode_ci',
       like: ''
     }
     if (options.force && cfg.exists) {
@@ -77,7 +81,7 @@ class Migrations {
     }
     cfg.columns = options.columns.map(internals.prepareColumn)
     cfg.columns = '(' + cfg.columns.join(',') + ')'
-    let sql = `CREATE TABLE IF NOT EXISTS ${this.tableName()} ${cfg.like} ${cfg.columns} ENGINE=${cfg.engine} DEFAULT CHARSET=${cfg.charset}`
+    let sql = `CREATE TABLE IF NOT EXISTS ${this.tableName()} ${cfg.like} ${cfg.columns} ENGINE=${cfg.engine} DEFAULT CHARSET=${cfg.charset} COLLATE=${cfg.collate}`
     if (options.verbose) {
       console.log(sql)
     }
@@ -103,8 +107,8 @@ class Migrations {
     if (!Array.isArray(options.columns)) {
       options.columns = [options.columns]
     }
-    cfg.columns = options.columns.map(internals.prepareColumn)
-    let sql = `ALTER TABLE ${this.tableName()} ${cfg.columns.join(' ')}`
+    cfg.columns = this.getColumns().join(',')
+    let sql = `ALTER TABLE ${this.tableName()} ${cfg.columns}`
     if (options.verbose) {
       console.log(sql)
     }
@@ -117,8 +121,77 @@ class Migrations {
     return this
   }
 
+  async addColumns (columns) {
+    columns.forEach(col => this.addColumn.apply(this, col))
+    return this
+  }
+
   async addColumn (name, type, options) {
-    let sql = `ALTER TABLE ${this.tableName()}`
+    name = '`' + name + '`'
+    if (options.notnull) {
+      options.notnull = 'NOT NULL'
+    } else {
+      options.notnull = 'NULL'
+    }
+    options.default = options.default || ''
+    options.update = options.update ? `ON UPDATE ${options.update}` : ''
+    if (options.autoincrement) {
+      options.notnull = true
+    }
+    let sql = [
+      'ADD',
+      name,
+      type
+    ]
+    sql.push(options.notnull ? 'NOT NULL' : 'NULL')
+    sql.push(options.default)
+    sql.push(options.update)
+    if (options.autoincrement) {
+      sql.push('AUTO_INCREMENT, ADD PRIMARY')
+    }
+    this.setColumn(sql.join(' '))
+    return this
+  }
+
+  async modifyColumns (columns) {
+    columns.forEach(col => this.modifyColumn.apply(this, col)).join(',')
+    return this
+  }
+
+  async modifyColumn (name, type, options) {
+    name = '`' + name + '`'
+    if (options.notnull) {
+      if (!options.notnullDefault) {
+        throw new Error('cant add notnull while notnullDefault is empty')
+      }
+      let nullFields = await this.Table.find().field(`COUNT(${name}) as count`).field('id').where(`${name} IS NULL`).doFirst()
+      if (nullFields.count > 0) {
+        let data = {}
+        data[name] = options.notnullDefault
+        await this.Table.update().where(`${name} IS NULL`).setFields(data).do()
+      }
+      options.notnull = 'NOT NULL'
+    } else {
+      options.notnull = 'NULL'
+    }
+    options.default = options.default || ''
+    options.update = options.update ? `ON UPDATE ${options.update}` : ''
+    if (options.autoincrement) {
+      options.notnull = true
+    }
+    let sql = [
+      'MODIFY',
+      name,
+      type
+    ]
+    sql.push(options.notnull ? 'NOT NULL' : 'NULL')
+    sql.push(options.default)
+    sql.push(options.update)
+    if (options.autoincrement) {
+      sql.push('AUTO_INCREMENT, ADD PRIMARY')
+    }
+    this.setColumn(sql.join(' '))
+    return this
   }
 
   async drop (ignoreExistance) {

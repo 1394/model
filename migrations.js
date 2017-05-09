@@ -127,6 +127,7 @@ class Migrations {
   }
 
   addColumn (name, type, options) {
+    options = options || {}
     name = '`' + name + '`'
     if (options.notnull) {
       options.notnull = 'NOT NULL'
@@ -159,6 +160,7 @@ class Migrations {
   }
 
   modifyColumn (name, type, options) {
+    options = options || {}
     name = '`' + name + '`'
     if (options.notnull) {
       if (!options.notnullDefault) {

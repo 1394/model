@@ -66,7 +66,7 @@ class Migrations {
       exists: await this.Table.exists(),
       engine: options.engine || 'InnoDB',
       charset: options.charset || 'utf8',
-      collate: options.collate || 'utf8_unicode_ci',
+      collate: options.collate || 'utf8_general_ci',
       like: ''
     }
     if (options.force && cfg.exists) {

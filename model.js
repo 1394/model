@@ -37,9 +37,9 @@ function Model (table, cfg = {}, dbname) {
   this.table = table
   this.dbname = dbname || internals.default_db_name
   if (!this.dbname) {
-    console.log('default_db_name = ',internals.default_db_name)
+    console.log('default_db_name = ', internals.default_db_name)
     console.log('db_config = ')
-    console.dir(internals.db_config,{depth: Infinity})
+    console.dir(internals.db_config, {depth: Infinity})
     throw new Error('cant make model w/o database name')
   }
   this.dbConfig = internals.db_config[this.dbname]
@@ -50,7 +50,11 @@ function Model (table, cfg = {}, dbname) {
   }
   this.df.i18n = i18n()
   this.squel.useFlavour('mysql')
-  this.DbConn = require('./lib/db')
+  if (this.modelConfig.alternate) {
+    this.DbConn = require('./lib/dbservice')
+  } else {
+    this.DbConn = require('./lib/db')
+  }
   this.base = new this.DbConn(this.dbConfig, internals.db_config.debug && internals.db_config.debug.models || cfg.debug)
 
   this.logs = []
@@ -158,7 +162,7 @@ Model.prototype.do = function (opts) {
     }
     requestString = me.query.toString()
     let params = me.query.toParam()
-    data = yield me.base.do({sql: params.text,values: params.values})
+    data = yield me.base.do({sql: params.text, values: params.values})
     if (opts.fields && typeof opts.fields === 'object' && opts.fields.length && Array.isArray(data)) {
       data = me.processFields(data, opts.fields)
     }

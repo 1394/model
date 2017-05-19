@@ -51,6 +51,7 @@ class Migrations {
       throw new Error('tableName cant be empty')
     }
     this.Model = require('./model')
+    options.serviceConn = true
     this.Table = new this.Model(this.tableName(true), options)
     let columns = []
     this.setColumn = function (col) { columns.push(col) }

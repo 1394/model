@@ -13,7 +13,7 @@ Model.setConfig(cfg)
 console.log('')
 
 if (mode === 'dbcreate') {
-  const Migration = new Migrations('', {debug: true, serviceConn: true})
+  const Migration = new Migrations('migrations', {debug: true, serviceConn: true})
   let dbName = name || cfg.database
   Migration.createDb(dbName, {charset: op1, collate: op2})
     .then(result => {

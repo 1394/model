@@ -1,15 +1,30 @@
 'use strict'
 
 const argv = require('minimist')(process.argv.slice(2))
+const [mode, name, op1, op2] = argv._
+
 const df = require('dateformat')
 const fs = require('fs')
 const path = require('path')
-
 const Model = require('@dmitri.leto/model')
-Model.setConfig(require('./database.json').dev)
+const Migrations = require('@dmitri.leto/model/migrations')
+const cfg = require('./database.json').dev
+Model.setConfig(cfg)
 console.log('')
 
-const [mode, name] = argv._
+if (mode === 'dbcreate') {
+  const Migration = new Migrations('', {debug: true, serviceConn: true})
+  let dbName = name || cfg.database
+  Migration.createDb(dbName, {charset: op1, collate: op2})
+    .then(result => {
+      console.log(result)
+      process.exit(0)
+    })
+    .catch(err => {
+      console.error(err)
+      process.exit(1)
+    })
+}
 
 if (mode === 'up' && !name) {
   const Migration = new Model('migrations')

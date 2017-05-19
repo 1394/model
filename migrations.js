@@ -60,6 +60,7 @@ class Migrations {
   }
 
   async createDb (name, options) {
+    var me = this
     options = options || {}
     options.charset = options.charset || 'utf8'
     options.collate = options.collate || 'utf8_general_ci'

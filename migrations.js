@@ -149,7 +149,7 @@ class Migrations {
     }
     options = options || {}
     name = '`' + name + '`'
-    options.default = options.default ? `DEFAULT '${options.default}'` : ''
+    options.default = options.default ? `DEFAULT ${options.default}` : ''
     options.update = options.update ? `ON UPDATE ${options.update}` : ''
     if (options.autoincrement) {
       options.notnull = true

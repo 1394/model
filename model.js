@@ -55,7 +55,8 @@ function Model (table, cfg = {}, dbname) {
   } else {
     this.DbConn = require('./lib/db')
   }
-  this.base = new this.DbConn(this.dbConfig, internals.db_config.debug && internals.db_config.debug.models || cfg.debug, {serviceConn: this.modelConfig.serviceConn})
+  internals.db_config.debug = internals.db_config.debug && internals.db_config.debug.models || cfg.debug
+  this.base = new this.DbConn(this.dbConfig, internals.db_config.debug, {serviceConn: this.modelConfig.serviceConn})
 
   this.logs = []
 

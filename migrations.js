@@ -59,6 +59,16 @@ class Migrations {
     return this
   }
 
+  async createDb (name, options) {
+    options = options || {}
+    options.charset = options.charset || 'utf8'
+    options.collate = options.collate || 'utf8_general_ci'
+    if (!name) {
+      throw new Error('database name cant be empty')
+    }
+    
+  }
+
   async create (options) {
     options = options || {}
     options.columns = options.columns || []

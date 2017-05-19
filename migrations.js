@@ -147,6 +147,9 @@ class Migrations {
     if (typeof name === 'string' && !type && !options) {
       return name
     }
+    if (name === 'id' && type === 'primary') {
+      return '`id` int(11) NOT NULL AUTO_INCREMENT,PRIMARY KEY (`id`)'
+    }
     options = options || {}
     name = '`' + name + '`'
     options.default = options.default ? `DEFAULT ${options.default}` : ''

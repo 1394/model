@@ -117,7 +117,7 @@ class Model {
 
     return co(function*() {
       var data
-      this._addOpMode('do')
+      me._addOpMode('do')
       if (me.paginate) {
         var result = { paginate: true }
         var totalSql = me.query.clone().field('COUNT(*) as count').toString()
@@ -132,11 +132,11 @@ class Model {
       requestString = me.query.toString()
       let params = me.query.toParam()
       data = yield me.base.do({sql: params.text, values: params.values})
-      if (this.opMode === 'find') {
+      if (me.opMode === 'find') {
 // run this._processFn if need
-        if (this._processFn) {
-          data = this.runCatch(function () {
-            return this._processFn(data)
+        if (me._processFn) {
+          data = me.runCatch(function () {
+            return me._processFn(data)
           }, opts)
         }
 

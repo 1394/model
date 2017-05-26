@@ -1,6 +1,7 @@
 'use strict'
 const co = require('co')
 const util = require('util')
+const Record = require('./record')
 const internals = {
   db_config: {},
   version: require('./package').version,
@@ -18,6 +19,11 @@ class Model {
       return this
     }
     this.modelConfig = cfg || {}
+    if (!cfg.oldMode) {
+      this.setProcessDataCallback(function (rows) {
+        return rows.map(row => new Record(row, {processed: true}))
+      })
+    }
     this.action = ''
     this.actionData = []
     this.redis = internals.redis

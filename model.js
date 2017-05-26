@@ -642,10 +642,10 @@ Model.prototype.offset = function (opts) {
 /**
 @method Model.order
 */
-Model.prototype.order = function () {
+Model.prototype.order = function (...args) {
   this.logs.push('order')
   try {
-    this.query = this.query.order.apply(this, Array.prototype.slice.call(arguments, 0))
+    this.query = this.query.order.apply(this, args)
   } catch (e) {
     this.showLog(e, arguments)
   }
@@ -668,8 +668,8 @@ Model.prototype.group = function (by) {
 /**
 @method Model.where
 */
-Model.prototype.where = function () {
-  let argsArr = Array.prototype.slice.call(arguments, 0)
+Model.prototype.where = function (...args) {
+  let argsArr = args
   this.actionData.push({ where: argsArr })
   this.logs.push('where')
   try {

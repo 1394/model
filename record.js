@@ -47,3 +47,5 @@ class Record {
     }
   }
 }
+
+module.exports = Record

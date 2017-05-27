@@ -42,6 +42,12 @@ const buildBelongsToAssoc = (record, opts) => {
       model: record.Model
     })
   }
+  record[`find${capitalize(opts.table)}`] = function (cfg = {}) {
+    if (!record.Model) {
+      return Promise.resolve()
+    }
+    return new record.Model(opts.table, {debug: true}).find().where(`${opts.primaryKey} = ?`, record.get(opts.foreignKey))
+  }
 }
 
 const buildHasManyAssoc = (record, opts) => {
@@ -56,6 +62,12 @@ const buildHasManyAssoc = (record, opts) => {
       owner: record.owner,
       model: record.Model
     }))
+  }
+  record[`find${capitalize(opts.table)}`] = function (cfg = {}) {
+    if (!record.Model) {
+      return Promise.resolve()
+    }
+    return new record.Model(opts.table, {debug: true}).find().where(`${opts.foreignKey} = ?`, record.get(opts.primaryKey))
   }
 }
 

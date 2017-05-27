@@ -5,12 +5,12 @@ const Record = require('./record')
 const internals = {
   db_config: {},
   version: require('./package').version,
-  i18n () {
-    return {
-      dayNames: ['вс', 'пн', 'вт', 'ср', 'чт', 'пт', 'сб', 'воскресенье', 'понедельник', 'вторник', 'среда', 'четверг', 'пятница', 'суббота'],
-      monthNames: ['янв', 'фев', 'март', 'апр', 'май', 'июнь', 'июль', 'авг', 'сен', 'окт', 'ноя', 'дек', 'январь', 'февраль', 'март', 'апрель', 'май', 'июнь', 'июль', 'август', 'сентябрь', 'октябрь', 'ноябрь', 'декабрь']
-    }
-  }
+  i18n: {
+    dayNames: ['вс', 'пн', 'вт', 'ср', 'чт', 'пт', 'сб', 'воскресенье', 'понедельник', 'вторник', 'среда', 'четверг', 'пятница', 'суббота'],
+    monthNames: ['янв', 'фев', 'март', 'апр', 'май', 'июнь', 'июль', 'авг', 'сен', 'окт', 'ноя', 'дек', 'январь', 'февраль', 'март', 'апрель', 'май', 'июнь', 'июль', 'август', 'сентябрь', 'октябрь', 'ноябрь', 'декабрь']
+  },
+  cachedModels: {},
+  associations: new Map()
 }
 
 class Model {
@@ -18,12 +18,11 @@ class Model {
     if (!internals.db_config) {
       return this
     }
+
+    this.assocs = internals.associations
+
+    this._Model = Model
     this.modelConfig = cfg || {}
-    if (!cfg.oldMode) {
-      this.setProcessDataCallback(function (rows) {
-        return rows.map(row => new Record(row, {processed: true}))
-      })
-    }
     this.action = ''
     this.actionData = []
     this.redis = internals.redis
@@ -38,18 +37,18 @@ class Model {
     this.dbConfig = internals.db_config[this.dbname]
     this.squel = require('squel')
     this.df = require('dateformat')
+    this.df.i18n = internals.i18n
     this.strftime = function (v, format) {
       return this.df(v, format || 'dd-mmmm-yyyy HH:MM')
     }
-    this.df.i18n = internals.i18n()
     this.squel.useFlavour('mysql')
-    if (this.modelConfig.alternate) {
-      this.DbConn = require('./lib/dbservice')
-    } else {
+
+    if (this.modelConfig.oldMode) {
       this.DbConn = require('./lib/db')
+    } else {
+      this.DbConn = require('./lib/dbservice')
     }
-    internals.db_config.debug = internals.db_config.debug && internals.db_config.debug.models || cfg.debug
-    this.base = new this.DbConn(this.dbConfig, internals.db_config.debug, {serviceConn: this.modelConfig.serviceConn})
+    this.base = new this.DbConn(this.dbConfig, this.modelConfig.debug, {serviceConn: this.modelConfig.serviceConn})
 
     this.logs = []
 
@@ -74,7 +73,25 @@ class Model {
     })
     this.query = ''
 
+    var me = this
+    if (!cfg.oldMode) {
+      this.setProcessDataCallback(function (rows) {
+        return rows.map(row => new Record(row, {processed: true, assoc: me.assocs.get(this.table), owner: me, model: Model}))
+      })
+    }
+
+    if (!internals.cachedModels[this.table]) {
+      internals.cachedModels[this.table] = me
+    }
     return this
+  }
+
+  static setAssoc (table, assoc) {
+    if (internals.associations.has(table)) {
+
+    } else {
+      internals.associations.set(table, assoc)
+    }
   }
 
   static setConfig (cfg) {
@@ -121,7 +138,7 @@ class Model {
     var me = this
     var requestString = ''
 
-    return co(function*() {
+    return co(function * () {
       var data
       me._addOpMode('do')
       if (me.paginate) {

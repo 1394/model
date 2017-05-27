@@ -38,6 +38,7 @@ const buildBelongsToAssoc = (record, opts) => {
     return data && new Record(data._data(), {
       processed: true,
       assoc: record.owner && record.owner.assocs.get(opts.table),
+      owner: record.owner,
       model: record.Model
     })
   }
@@ -52,6 +53,7 @@ const buildHasManyAssoc = (record, opts) => {
     return data.map(row => new Record(row._data(), {
       processed: true,
       assoc: record.owner && record.owner.assocs.get(opts.table),
+      owner: record.owner,
       model: record.Model
     }))
   }
@@ -68,12 +70,12 @@ class Record {
     // this.Model = Model
     let config = {
       fields: options.fields || [],
-      owner: options.owner,
       row: rowData,
       modified: {},
       keys: Object.keys(rowData)
     }
     this._config = () => config
+    this.owner = options.owner
     this.isNew = () => { return newRecord }
     this.Model = options.model
     this.keys = () => config.keys

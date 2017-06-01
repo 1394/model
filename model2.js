@@ -182,11 +182,11 @@ class Model {
   }
 
   doFirst () {
-    return this.do({ first: true })
+    return this.first()
   }
 
-  doLast () {
-    return this.do({ last: true })
+  first () {
+    return this.limit(1).do({ first: true })
   }
 
   _setOpMode (mode) {

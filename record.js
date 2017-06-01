@@ -83,6 +83,7 @@ class Record {
     let config = {
       fields: options.fields || [],
       row: rowData,
+      table: options.table,
       modified: {},
       keys: Object.keys(rowData)
     }
@@ -123,6 +124,34 @@ class Record {
     } else {
       return this._data()
     }
+  }
+
+  getObj (...args) {
+    let obj = {}
+    if (args.length) {
+      args.forEach(el => {
+        obj[el] = this._data()[el]
+      })
+    } else {
+      this.keys().forEach(el => {
+        obj[el] = this._data()[el]
+      })
+    }
+    return obj
+  }
+
+  _getModel () {
+    return new this.Model(this.owner.table, this.owner.modelConfig, this.owner.dbname)
+  }
+
+  find () {
+    return this._getModel().find().where(`${this.owner.table}.id = ?`, this.get('id'))
+  }
+  update () {
+    return this._getModel().update().where(`${this.owner.table}.id = ?`, this.get('id'))
+  }
+  delete () {
+    return this._getModel().delete().where(`${this.owner.table}.id = ?`, this.get('id'))
   }
 }
 

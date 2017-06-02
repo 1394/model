@@ -258,6 +258,14 @@ class Model {
     return this
   }
 
+  count () {
+    this._addOpMode('count')
+    return this.runCatch(function () {
+      this.query = this.squel.select().from(this.table).field('COUNT(' + this.table + '.id) AS count')
+      return this
+    })
+  }
+
   join (table, where, alias) {
     this._addOpMode('join')
     return this.runCatch(function () {
@@ -320,6 +328,10 @@ class Model {
     }, opts)
   }
 
+  set (opts) {
+    return this.setFields(opts)
+  }
+
   limit (opts) {
     this._addOpMode('limit')
     return this.runCatch(function () {
@@ -361,7 +373,7 @@ class Model {
     }, args)
   }
 
-  set (k, v) {
+  setKV (k, v) {
     k = '`' + this.table + '`.`' + k + '`'
     this.query = this.query.set(k, v)
     return this

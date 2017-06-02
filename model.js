@@ -11,20 +11,19 @@ const internals = {
 }
 
 /**
-@class Model
-обеспечивает интерфейс запросов к БД
-used modules :
- [mysql](https://github.com/felixge/node-mysql)
- [squel](http://hiddentao.github.io/squel)
-
-@example
-var model = require('somepath/model')
-var Item = new model('items')
-
-@param {String} table - table name
-@param {Object} cfg - model config
-@param {Array} cfg.fields - array of fields, for example : [{ name: 'webname', hide: true, convert: function(v){return 'site name : '+v} }]
-
+* обеспечивает интерфейс запросов к БД
+* used modules :
+*  [mysql](https://github.com/felixge/node-mysql)
+*  [squel](http://hiddentao.github.io/squel)
+* @class Model
+* @example
+* var model = require('somepath/model')
+* var Item = new model('items')
+*
+* @param {String} table - table name
+* @param {Object} cfg - model config
+* @param {Array} cfg.fields - array of fields, for example : [{ name: 'webname', hide: true, convert: function(v){return 'site name : '+v} }]
+*
 */
 function Model (table, cfg = {}, dbname) {
   if (!internals.db_config) {

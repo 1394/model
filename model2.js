@@ -1,6 +1,7 @@
 'use strict'
 const co = require('co')
 const util = require('util')
+const crypto = require('crypto')
 const Record = require('./record')
 const internals = {
   db_config: {},
@@ -10,7 +11,8 @@ const internals = {
     monthNames: ['янв', 'фев', 'март', 'апр', 'май', 'июнь', 'июль', 'авг', 'сен', 'окт', 'ноя', 'дек', 'январь', 'февраль', 'март', 'апрель', 'май', 'июнь', 'июль', 'август', 'сентябрь', 'октябрь', 'ноябрь', 'декабрь']
   },
   cachedModels: {},
-  associations: new Map()
+  associations: new Map(),
+  hashString: (string) => { return crypto.createHash('md5').update(string).digest('hex') }
 }
 
 class Model {
@@ -124,6 +126,7 @@ class Model {
 
   static setRedis (redis) {
     internals.redis = redis
+    this.redis = redis
   }
 
   setProcessDataCallback (processFn) {
@@ -131,6 +134,36 @@ class Model {
       this._processFn = processFn
     }
   }
+
+  async incrTable (request) {
+    if (this.redis) {
+      try {
+        let key = internals.hashString(request)
+        console.log('key %s for request %s', key, request)
+        await this.redis.hincrby('sqlTableCounts', this.table, 1)
+        await this.redis.hincrby('sqlRequestCounts', key, 1)
+        await this.redis.hset('sqlRequestKeys', this.table, key)
+      } catch (ex) {
+        console.error(ex)
+      }
+    }
+  }
+
+  // getTableKey () {
+  //   try {
+  //     return this.redis.hget('sqlTableKeys', this.table)
+  //   } catch (ex) {
+  //     console.error(ex)
+  //   }
+  // }
+
+  // async getOrCashed (request) {
+  //   let key = await this.getTableKey()
+  //   if (key) {
+  //     let data = await this.redis.hget('sqlRequestCache', key)
+  //   }
+  //   return data
+  // }
 
   do (opts) {
     opts = opts || {}
@@ -153,6 +186,7 @@ class Model {
         return result
       }
       requestString = me.query.toString()
+      yield me.incrTable(requestString)
       let params = me.query.toParam()
       data = yield me.base.do({sql: params.text, values: params.values})
       if (me.opMode === 'find') {

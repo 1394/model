@@ -2,12 +2,14 @@
 
 const co = require('co')
 const util = require('util')
+const crypto = require('crypto')
 
 const Field = require('./lib/field')
 
 const internals = {
   db_config: {},
-  version: require('./package').version
+  version: require('./package').version,
+  hashString: (string) => { return crypto.createHash('md5').update(string).digest('hex') }
 }
 
 /**
@@ -161,6 +163,26 @@ Model.prototype.do = function (opts) {
       return result
     }
     requestString = me.query.toString()
+
+    if (me.redis) {
+      try {
+        let key = internals.hashString(requestString)
+        console.log('key %s for request %s', key, requestString)
+        yield me.redis.hincrby('sqlTableCounts', me.table, 1)
+        yield me.redis.hincrby('sqlRequestCounts', key, 1)
+        yield me.redis.hset('sqlRequestKeys', key, requestString)
+        yield me.redis.hset('sqlRequestTables', key, me.table)
+        let existReq = yield me.redis.get(`r.${key}`)
+        if (existReq) {
+          let cachedData = yield me.redis.hget('sqlRequestCache', key)
+        } else {
+          yield me.redis.set(`r.${key}`, 'EX', 120)
+        }
+      } catch (ex) {
+        console.error(ex)
+      }
+    }
+
     let params = me.query.toParam()
     data = yield me.base.do({sql: params.text, values: params.values})
     if (opts.fields && typeof opts.fields === 'object' && opts.fields.length && Array.isArray(data)) {

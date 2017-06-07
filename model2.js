@@ -361,6 +361,12 @@ class Model {
   page (page, pageSize) {
     pageSize = pageSize || this.modelConfig.pageSize || 20
     let offset
+    if (typeof page === 'object') {
+      let opts = page
+      page = opts.page
+      pageSize = opts.limit || this.modelConfig.pageSize || 20
+      offset = opts.offset
+    }
     this._addOpMode('page')
     if (page < 1) page = 1
     this.paginate = {

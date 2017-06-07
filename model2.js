@@ -174,7 +174,7 @@ class Model {
       throw new Error('cant do paginate while paging is not configured, try call .page(number) or .doPage(number)!')
     }
     let result = { paginate: true }
-    let totalSql = this.query.clone().field('COUNT(*) as count').toString()
+    let totalSql = this.query.clone().field(`COUNT(${this.table}.*) as count`).toString()
     let query = this.query.limit(this.paginate.limit).offset(this.paginate.offset).toString()
     let data
     try {

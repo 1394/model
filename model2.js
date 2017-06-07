@@ -213,9 +213,19 @@ class Model {
       return this.doPage()
     }
     requestString = this.query.toString()
-    await this.incrTable(requestString)
+    try {
+      await this.incrTable(requestString)
+    } catch (ex) {
+      console.error(ex)
+      throw ex
+    }
     let params = this.query.toParam()
-    data = await this.base.do({sql: params.text, values: params.values})
+    try {
+      data = await this.base.do({sql: params.text, values: params.values})
+    } catch (ex) {
+      console.error('error while request : %s\n', requestString, JSON.stringify(ex))
+      throw ex
+    }
     if (this.opMode === 'find') {
       if (this._processFn) {
         data = this.runCatch(function () {

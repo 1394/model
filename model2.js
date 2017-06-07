@@ -182,6 +182,21 @@ class Model {
         result.count = data[0].count
         result.pages = Math.ceil(result.count / me.paginate.limit)
         data = yield me.base.do(query)
+        if (me.opMode === 'find') {
+  // run this._processFn if need
+          if (me._processFn) {
+            data = me.runCatch(function () {
+              return me._processFn(data)
+            }, opts)
+          }
+
+          if (opts.last) {
+            return data.pop()
+          }
+          if (opts.first) {
+            return data.shift()
+          }
+        }
         result.rows = data
         return result
       }

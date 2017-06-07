@@ -165,70 +165,138 @@ class Model {
   //   return data
   // }
 
-  do (opts) {
+  async doPage (page, limit) {
+    this._addOpMode('doPage')
+    if (page) {
+      this.page(page, limit)
+    }
+    if (!this.paginate) {
+      throw new Error('cant do paginate while paging is not configured, try call .page(number) or .doPage(number)!')
+    }
+    let result = { paginate: true }
+    let totalSql = this.query.clone().field('COUNT(*) as count').toString()
+    let query = this.query.limit(this.paginate.limit).offset(this.paginate.offset).toString()
+    let data
+    try {
+      data = await this.base.do(totalSql)
+    } catch (ex) {
+      console.error('error while count total : %s\n', totalSql, JSON.stringify(ex))
+      throw ex
+    }
+    result.count = data[0].count
+    result.pages = Math.ceil(result.count / this.paginate.limit)
+    try {
+      data = await this.base.do(query)
+    } catch (ex) {
+      console.error('error while request : %s\n', query, JSON.stringify(ex))
+      throw ex
+    }
+    if (this.opMode === 'find') {
+      if (this._processFn) {
+        data = this.runCatch(function () {
+          return this._processFn(data)
+        }, page, limit)
+      }
+    }
+    result.rows = data
+    return result
+  }
+
+  async do (opts) {
     opts = opts || {}
     opts.fields = opts.fields || this.modelConfig.fields
-    var me = this
     var requestString = ''
 
-    return co(function * () {
-      var data
-      me._addOpMode('do')
-      if (me.paginate) {
-        var result = { paginate: true }
-        var totalSql = me.query.clone().field('COUNT(*) as count').toString()
-        var query = me.query.limit(me.paginate.limit).offset(me.paginate.offset).toString()
-        data = yield me.base.do(totalSql)
-        result.count = data[0].count
-        result.pages = Math.ceil(result.count / me.paginate.limit)
-        data = yield me.base.do(query)
-        if (me.opMode === 'find') {
-  // run this._processFn if need
-          if (me._processFn) {
-            data = me.runCatch(function () {
-              return me._processFn(data)
-            }, opts)
-          }
-
-          if (opts.last) {
-            return data.pop()
-          }
-          if (opts.first) {
-            return data.shift()
-          }
-        }
-        result.rows = data
-        return result
+    var data
+    this._addOpMode('do')
+    if (this.paginate) {
+      return this.doPage()
+    }
+    requestString = this.query.toString()
+    await this.incrTable(requestString)
+    let params = this.query.toParam()
+    data = await this.base.do({sql: params.text, values: params.values})
+    if (this.opMode === 'find') {
+      if (this._processFn) {
+        data = this.runCatch(function () {
+          return this._processFn(data)
+        }, opts)
       }
-      requestString = me.query.toString()
-      yield me.incrTable(requestString)
-      let params = me.query.toParam()
-      data = yield me.base.do({sql: params.text, values: params.values})
-      if (me.opMode === 'find') {
-// run this._processFn if need
-        if (me._processFn) {
-          data = me.runCatch(function () {
-            return me._processFn(data)
-          }, opts)
-        }
 
-        if (opts.last) {
-          return data.pop()
-        }
-        if (opts.first) {
-          return data.shift()
-        }
+      if (opts.last) {
+        return data.pop()
       }
-      return data
-    })
-    .then(data => {
-      return data
-    })
-    .catch(err => {
-      let msg = err + ' : ' + requestString
-      throw msg
-    })
+      if (opts.first) {
+        return data.shift()
+      }
+    }
+    return data
   }
+
+//   do (opts) {
+//     opts = opts || {}
+//     opts.fields = opts.fields || this.modelConfig.fields
+//     var me = this
+//     var requestString = ''
+
+//     return co(function * () {
+//       var data
+//       me._addOpMode('do')
+//       if (me.paginate) {
+//         var result = { paginate: true }
+//         var totalSql = me.query.clone().field('COUNT(*) as count').toString()
+//         var query = me.query.limit(me.paginate.limit).offset(me.paginate.offset).toString()
+//         data = yield me.base.do(totalSql)
+//         result.count = data[0].count
+//         result.pages = Math.ceil(result.count / me.paginate.limit)
+//         data = yield me.base.do(query)
+//         if (me.opMode === 'find') {
+//   // run this._processFn if need
+//           if (me._processFn) {
+//             data = me.runCatch(function () {
+//               return me._processFn(data)
+//             }, opts)
+//           }
+
+//           if (opts.last) {
+//             return data.pop()
+//           }
+//           if (opts.first) {
+//             return data.shift()
+//           }
+//         }
+//         result.rows = data
+//         return result
+//       }
+//       requestString = me.query.toString()
+//       yield me.incrTable(requestString)
+//       let params = me.query.toParam()
+//       data = yield me.base.do({sql: params.text, values: params.values})
+//       if (me.opMode === 'find') {
+// // run this._processFn if need
+//         if (me._processFn) {
+//           data = me.runCatch(function () {
+//             return me._processFn(data)
+//           }, opts)
+//         }
+
+//         if (opts.last) {
+//           return data.pop()
+//         }
+//         if (opts.first) {
+//           return data.shift()
+//         }
+//       }
+//       return data
+//     })
+//     .then(data => {
+//       return data
+//     })
+//     .catch(err => {
+//       let msg = err + ' : ' + requestString
+//       throw msg
+//     })
+//   }
 
   doFirst () {
     return this.first()
@@ -290,19 +358,15 @@ class Model {
     }, table)
   }
 
-  page (page, limit) {
+  page (page, pageSize) {
+    pageSize = pageSize || this.modelConfig.pageSize || 20
     let offset
-    if (typeof page === 'object') {
-      let opts = page
-      page = opts.page
-      limit = opts.limit
-      offset = opts.offset
-    }
     this._addOpMode('page')
     if (page < 1) page = 1
     this.paginate = {
-      offset: offset || ((page - 1) * limit),
-      limit: limit || 20
+      page: page,
+      offset: offset || ((page - 1) * pageSize),
+      limit: pageSize
     }
     return this
   }

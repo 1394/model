@@ -178,7 +178,7 @@ class Model {
     let query = this.query.limit(this.paginate.limit).offset(this.paginate.offset).toString()
     let data
     try {
-      data = await this.base.do(totalSql)
+      data = await this.base.do(totalSql).catch(ex => { console.error(ex); throw ex })
     } catch (ex) {
       console.error('error while count total : %s\n', totalSql, JSON.stringify(ex))
       throw ex
@@ -186,7 +186,7 @@ class Model {
     result.count = data[0].count
     result.pages = Math.ceil(result.count / this.paginate.limit)
     try {
-      data = await this.base.do(query)
+      data = await this.base.do(query).catch(ex => { console.error(ex); throw ex })
     } catch (ex) {
       console.error('error while request : %s\n', query, JSON.stringify(ex))
       throw ex

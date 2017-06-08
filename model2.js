@@ -88,6 +88,12 @@ class Model {
     return this
   }
 
+  consoleDebug (...args) {
+    if (this.modelConfig.debug) {
+      console.info.apply(this, args)
+    }
+  }
+
   static setAssoc (table, assoc) {
     if (internals.associations.has(table)) {
 
@@ -137,6 +143,7 @@ class Model {
 
   async incrTable (request) {
     if (this.redis) {
+      let start = Date.now()
       try {
         let key = internals.hashString(request)
         // console.log('key %s for request %s', key, request)
@@ -147,6 +154,7 @@ class Model {
       } catch (ex) {
         console.error(JSON.stringify(ex))
       }
+      this.consoleDebug(`logTime to redis : ${Date.now() - start}`)
     }
   }
 

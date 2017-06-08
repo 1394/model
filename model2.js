@@ -144,9 +144,8 @@ class Model {
   async incrTable (request) {
     if (this.redis) {
       let start = Date.now()
+      let key = internals.hashString(request)
       try {
-        let key = internals.hashString(request)
-        // console.log('key %s for request %s', key, request)
         await this.redis.hincrby('sqlTableCounts', this.table, 1)
         await this.redis.hincrby('sqlRequestCounts', key, 1)
         await this.redis.hset('sqlRequestKeys', this.table, key)
@@ -154,14 +153,12 @@ class Model {
       } catch (ex) {
         console.error(JSON.stringify(ex))
       }
-      this.consoleDebug(`internal logTime to redis : ${Date.now() - start}`)
+      this.consoleDebug(`redis logTime for key [${key}] : ${Date.now() - start}`)
     }
   }
 
   async _doRequest (params) {
-    let start = Date.now()
     this.incrTable(JSON.stringify(params))
-    this.consoleDebug(`external logTime to redis : ${Date.now() - start}`)
     let data = await this.base.do({sql: params.text, values: params.values}).catch(ex => {
       console.error('error while count total : %s\n', JSON.stringify(params), JSON.stringify(ex))
       throw ex

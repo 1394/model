@@ -98,8 +98,15 @@ class Model {
   _setupGlobalListeners () {
     let eventListeners = new Map()
     let _events = internals.eventHandlers.get(this.table)
-    if (Array.isArray(_events) && _events.length) {
-      Object.keys(_events).forEach(event => typeof (_events[event][0]) === 'function' && eventListeners.set(event, _events[event][0], _events[event][1]))
+    if (typeof _events === 'object' && Object.keys(_events).length) {
+      Object.keys(_events).forEach(event => {
+        let handler = typeof _events[event] === 'function' ? _events[event] : _events[event].shift()
+        let scope = _events[event].shift()
+        if (typeof handler !== 'function') {
+          return
+        }
+        eventListeners.set(event, handler, scope)
+      })
     }
     return eventListeners
   }

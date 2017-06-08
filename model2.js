@@ -149,7 +149,7 @@ class Model {
         await this.redis.hincrby('sqlTableCounts', this.table, 1)
         await this.redis.hincrby('sqlRequestCounts', key, 1)
         await this.redis.hset('sqlRequestKeys', this.table, key)
-        await this.redis.hset('sqlRequests', key, request)
+        await this.redis.hset('sqlRequests', key, `${this.getOpMode()}:${request}`)
       } catch (ex) {
         console.error(JSON.stringify(ex))
       }
@@ -158,6 +158,7 @@ class Model {
   }
 
   async _doRequest (params) {
+    this.consoleDebug(this.getOpMode())
     this.incrTable(JSON.stringify(params))
     let data = await this.base.do({sql: params.text, values: params.values}).catch(ex => {
       console.error('error while count total : %s\n', JSON.stringify(params), JSON.stringify(ex))

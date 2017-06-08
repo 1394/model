@@ -1,5 +1,13 @@
 'use strict'
 
+const EventEmitter = require('events')
+
+class ModelEmitter extends EventEmitter {
+  addEventHandler (table, event, handler, scope) {
+    this.on(table + '.' + event, handler.bind(scope))
+  }
+}
+
 const util = require('util')
 const crypto = require('crypto')
 const Record = require('./record')
@@ -13,7 +21,8 @@ const internals = {
   cachedModels: {},
   associations: new Map(),
   hashString: (string) => { return crypto.createHash('md5').update(string).digest('hex') },
-  eventHandlers: new Map()
+  eventProxy: new ModelEmitter(),
+  events: new Map()
 }
 
 class Model {
@@ -23,6 +32,8 @@ class Model {
     }
 
     this.assocs = internals.associations
+
+    this.eventProxy = internals.eventProxy
 
     this._Model = Model
     this.modelConfig = cfg || {}
@@ -37,12 +48,7 @@ class Model {
       console.dir(internals.db_config, {depth: Infinity})
       throw new Error('cant make model w/o database name')
     }
-
-    let eventListeners = this._setupGlobalListeners()
-    this._getEventListeners = function () {
-      return eventListeners
-    }
-
+    this._setupGlobalListeners()// must be set table before call!!!
     this.dbConfig = internals.db_config[this.dbname]
     this.squel = require('squel')
     this.df = require('dateformat')
@@ -96,8 +102,7 @@ class Model {
   }
 
   _setupGlobalListeners () {
-    let eventListeners = new Map()
-    let _events = this._Model.getListeners().get(this.table)
+    let _events = internals.events.get(this.table)
     if (typeof _events === 'object' && Object.keys(_events).length) {
       Object.keys(_events).forEach(event => {
         let handler = typeof _events[event] === 'function' ? _events[event] : _events[event].handler
@@ -105,18 +110,19 @@ class Model {
         if (typeof handler !== 'function') {
           return
         }
-        eventListeners.set(event, {handler, scope})
+        this.eventProxy.addEventHandler(this.table, event, handler, scope || this)
       })
     }
-    return eventListeners
   }
 
   static setupListeners (table, events) {
-    internals.eventHandlers.set(table, events)
-  }
-
-  static getListeners () {
-    return internals.eventHandlers
+    if (!events) {
+      Object.keys(table).forEach(key => {
+        internals.events.set(key, table[key])
+      })
+    } else {
+      internals.events.set(table, events)
+    }
   }
 
   consoleDebug (...args) {
@@ -190,12 +196,12 @@ class Model {
 
   /**
  * @param {String} event
- * @param {Function} handler after event handler will call with args : Model instance, returned operation data
+ * @param {Function} handler after event handler will call with args : Model instance, request params, returned operation data
  * @param {Object} scope
  * @memberof Model
  */
   on (event, handler, scope) {
-    this._getEventListeners().set(event, {handler, scope})
+    this.eventProxy.addEventHandler(this.table, event, handler, scope || this)
   }
 
   getListener (event) {
@@ -209,15 +215,16 @@ class Model {
       console.error('error while count total : %s\n', JSON.stringify(params), JSON.stringify(ex))
       throw ex
     })
-    let event = this.getOpMode()
-    let eventAllHandler = this.getListener('*')
-    let eventHandler = this.getListener(event)
-    if (eventHandler && typeof eventHandler.handler === 'function') {
-      eventHandler.handler.call(eventHandler.scope || this, this, data)
-    }
-    if (eventAllHandler && typeof eventAllHandler.handler === 'function') {
-      eventAllHandler.handler.call(eventAllHandler.scope || this, this, data)
-    }
+    let event = this.table + '.' + this.getOpMode()
+    internals.eventProxy.emit(event, this, params, data)
+    // let eventAllHandler = this.getListener('*')
+    // let eventHandler = this.getListener(event)
+    // if (eventHandler && typeof eventHandler.handler === 'function') {
+    //   eventHandler.handler.call(eventHandler.scope || this, this, data)
+    // }
+    // if (eventAllHandler && typeof eventAllHandler.handler === 'function') {
+    //   eventAllHandler.handler.call(eventAllHandler.scope || this, this, data)
+    // }
     return data
   }
 

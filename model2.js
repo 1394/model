@@ -22,7 +22,7 @@ class Model {
       return this
     }
 
-    let eventListeners = this._setupGlobalListeners(eventListeners)
+    let eventListeners = this._setupGlobalListeners()
 
     this._getEventListeners = function () {
       return eventListeners

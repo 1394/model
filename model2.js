@@ -1,5 +1,5 @@
 'use strict'
-const co = require('co')
+
 const util = require('util')
 const crypto = require('crypto')
 const Record = require('./record')
@@ -149,21 +149,19 @@ class Model {
     }
   }
 
-  // getTableKey () {
-  //   try {
-  //     return this.redis.hget('sqlTableKeys', this.table)
-  //   } catch (ex) {
-  //     console.error(ex)
-  //   }
-  // }
-
-  // async getOrCashed (request) {
-  //   let key = await this.getTableKey()
-  //   if (key) {
-  //     let data = await this.redis.hget('sqlRequestCache', key)
-  //   }
-  //   return data
-  // }
+  async _doRequest (params) {
+    try {
+      await this.incrTable(JSON.stringify(params))
+    } catch (ex) {
+      console.error(ex)
+      throw ex
+    }
+    let data = await this.base.do({sql: params.text, values: params.values}).catch(ex => {
+      console.error('error while count total : %s\n', JSON.stringify(params), JSON.stringify(ex))
+      throw ex
+    })
+    return data
+  }
 
   async doPage (page, limit) {
     this._addOpMode('doPage')
@@ -174,23 +172,24 @@ class Model {
       throw new Error('cant do paginate while paging is not configured, try call .page(number) or .doPage(number)!')
     }
     let result = { paginate: true }
-    let totalSql = this.query.clone().field(`COUNT(${this.table}.id) as count`).toString()
-    let query = this.query.limit(this.paginate.limit).offset(this.paginate.offset).toString()
+    let paramsTotal = this.query.clone().field(`COUNT(${this.table}.id) as count`).toParam()
+    let paramsQuery = this.query.limit(this.paginate.limit).offset(this.paginate.offset).toString()
     let data
-    try {
-      data = await this.base.do(totalSql).catch(ex => { console.error(ex); throw ex })
-    } catch (ex) {
-      console.error('error while count total : %s\n', totalSql, JSON.stringify(ex))
-      throw ex
-    }
+    // try {
+      // data = await this.base.do(totalSql).catch(ex => { console.error(ex); throw ex })
+    data = await this._doRequest(paramsTotal)
+    // } catch (ex) {
+    //   console.error('error while count total : %s\n', paramsTotal, JSON.stringify(ex))
+    //   throw ex
+    // }
     result.count = data[0].count
     result.pages = Math.ceil(result.count / this.paginate.limit)
-    try {
-      data = await this.base.do(query).catch(ex => { console.error(ex); throw ex })
-    } catch (ex) {
-      console.error('error while request : %s\n', query, JSON.stringify(ex))
-      throw ex
-    }
+    // try {
+    data = await this._doRequest(paramsQuery).catch(ex => { console.error(ex); throw ex })
+    // } catch (ex) {
+    //   console.error('error while request : %s\n', paramsQuery, JSON.stringify(ex))
+    //   throw ex
+    // }
     if (this.opMode === 'find') {
       if (this._processFn) {
         data = this.runCatch(function () {
@@ -213,15 +212,10 @@ class Model {
       return this.doPage()
     }
     requestString = this.query.toString()
-    try {
-      await this.incrTable(requestString)
-    } catch (ex) {
-      console.error(ex)
-      throw ex
-    }
     let params = this.query.toParam()
     try {
-      data = await this.base.do({sql: params.text, values: params.values})
+      // data = await this.base.do({sql: params.text, values: params.values})
+      data = await this._doRequest({sql: params.text, values: params.values})
     } catch (ex) {
       console.error('error while request : %s\n', requestString, JSON.stringify(ex))
       throw ex
@@ -242,71 +236,6 @@ class Model {
     }
     return data
   }
-
-//   do (opts) {
-//     opts = opts || {}
-//     opts.fields = opts.fields || this.modelConfig.fields
-//     var me = this
-//     var requestString = ''
-
-//     return co(function * () {
-//       var data
-//       me._addOpMode('do')
-//       if (me.paginate) {
-//         var result = { paginate: true }
-//         var totalSql = me.query.clone().field('COUNT(*) as count').toString()
-//         var query = me.query.limit(me.paginate.limit).offset(me.paginate.offset).toString()
-//         data = yield me.base.do(totalSql)
-//         result.count = data[0].count
-//         result.pages = Math.ceil(result.count / me.paginate.limit)
-//         data = yield me.base.do(query)
-//         if (me.opMode === 'find') {
-//   // run this._processFn if need
-//           if (me._processFn) {
-//             data = me.runCatch(function () {
-//               return me._processFn(data)
-//             }, opts)
-//           }
-
-//           if (opts.last) {
-//             return data.pop()
-//           }
-//           if (opts.first) {
-//             return data.shift()
-//           }
-//         }
-//         result.rows = data
-//         return result
-//       }
-//       requestString = me.query.toString()
-//       yield me.incrTable(requestString)
-//       let params = me.query.toParam()
-//       data = yield me.base.do({sql: params.text, values: params.values})
-//       if (me.opMode === 'find') {
-// // run this._processFn if need
-//         if (me._processFn) {
-//           data = me.runCatch(function () {
-//             return me._processFn(data)
-//           }, opts)
-//         }
-
-//         if (opts.last) {
-//           return data.pop()
-//         }
-//         if (opts.first) {
-//           return data.shift()
-//         }
-//       }
-//       return data
-//     })
-//     .then(data => {
-//       return data
-//     })
-//     .catch(err => {
-//       let msg = err + ' : ' + requestString
-//       throw msg
-//     })
-//   }
 
   doFirst () {
     return this.first()

@@ -21,6 +21,12 @@ class Model {
       return this
     }
 
+    let eventListeners = new Map()
+
+    this._getEventListeners = function () {
+      return eventListeners
+    }
+
     this.assocs = internals.associations
 
     this._Model = Model
@@ -86,6 +92,20 @@ class Model {
       internals.cachedModels[this.table] = me
     }
     return this
+  }
+
+/**
+ * @param {String} event
+ * @param {Function} handler after event handler will call with args : Model instance, returned operation data
+ * @param {Object} scope
+ * @memberof Model
+ */
+  on (event, handler, scope) {
+    this._getEventListeners().set(event, {handler, scope})
+  }
+
+  getListener (event) {
+    return this._getEventListeners().get(event)
   }
 
   consoleDebug (...args) {
@@ -164,6 +184,10 @@ class Model {
       console.error('error while count total : %s\n', JSON.stringify(params), JSON.stringify(ex))
       throw ex
     })
+    let eventHandler = this.getListener(this.getOpMode())
+    if (eventHandler && typeof eventHandler.handler === 'function') {
+      eventHandler.handler.call(eventHandler.scope || this, this, data)
+    }
     return data
   }
 

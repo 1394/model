@@ -172,7 +172,7 @@ class Model {
     }
     let result = { paginate: true }
     let paramsTotal = this.query.clone().field(`COUNT(${this.table}.id) as count`).toParam()
-    let paramsQuery = this.query.limit(this.paginate.limit).offset(this.paginate.offset).toString()
+    let paramsQuery = this.query.limit(this.paginate.limit).offset(this.paginate.offset).toParam()
     let data
     data = await this._doRequest(paramsTotal)
     result.count = data[0].count
@@ -192,21 +192,14 @@ class Model {
   async do (opts) {
     opts = opts || {}
     opts.fields = opts.fields || this.modelConfig.fields
-    var requestString = ''
 
     var data
     this._addOpMode('do')
     if (this.paginate) {
       return this.doPage()
     }
-    requestString = this.query.toString()
     let params = this.query.toParam()
-    try {
-      data = await this._doRequest({sql: params.text, values: params.values})
-    } catch (ex) {
-      console.error('error while request : %s\n', requestString, JSON.stringify(ex))
-      throw ex
-    }
+    data = await this._doRequest(params)
     if (this.opMode === 'find') {
       if (this._processFn) {
         data = this.runCatch(function () {

@@ -22,12 +22,6 @@ class Model {
       return this
     }
 
-    let eventListeners = this._setupGlobalListeners()
-
-    this._getEventListeners = function () {
-      return eventListeners
-    }
-
     this.assocs = internals.associations
 
     this._Model = Model
@@ -43,6 +37,12 @@ class Model {
       console.dir(internals.db_config, {depth: Infinity})
       throw new Error('cant make model w/o database name')
     }
+
+    let eventListeners = this._setupGlobalListeners()
+    this._getEventListeners = function () {
+      return eventListeners
+    }
+
     this.dbConfig = internals.db_config[this.dbname]
     this.squel = require('squel')
     this.df = require('dateformat')
@@ -97,15 +97,15 @@ class Model {
 
   _setupGlobalListeners () {
     let eventListeners = new Map()
-    let _events = internals.eventHandlers.get(this.table)
+    let _events = this._Model.getListeners().get(this.table)
     if (typeof _events === 'object' && Object.keys(_events).length) {
       Object.keys(_events).forEach(event => {
-        let handler = typeof _events[event] === 'function' ? _events[event] : _events[event].shift()
-        let scope = _events[event].shift()
+        let handler = typeof _events[event] === 'function' ? _events[event] : _events[event].handler
+        let scope = _events[event].scope
         if (typeof handler !== 'function') {
           return
         }
-        eventListeners.set(event, handler, scope)
+        eventListeners.set(event, {handler, scope})
       })
     }
     return eventListeners
@@ -113,6 +113,10 @@ class Model {
 
   static setupListeners (table, events) {
     internals.eventHandlers.set(table, events)
+  }
+
+  static getListeners () {
+    return internals.eventHandlers
   }
 
   consoleDebug (...args) {

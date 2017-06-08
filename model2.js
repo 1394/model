@@ -217,19 +217,11 @@ class Model {
     })
     let event = this.table + '.' + this.getOpMode()
     internals.eventProxy.emit(event, this, params, data)
-    // let eventAllHandler = this.getListener('*')
-    // let eventHandler = this.getListener(event)
-    // if (eventHandler && typeof eventHandler.handler === 'function') {
-    //   eventHandler.handler.call(eventHandler.scope || this, this, data)
-    // }
-    // if (eventAllHandler && typeof eventAllHandler.handler === 'function') {
-    //   eventAllHandler.handler.call(eventAllHandler.scope || this, this, data)
-    // }
     return data
   }
 
   async doPage (page, limit) {
-    this._addOpMode('doPage')
+    this._addOpMode('doPage', page, limit)
     if (page) {
       this.page(page, limit)
     }
@@ -260,7 +252,7 @@ class Model {
     opts.fields = opts.fields || this.modelConfig.fields
 
     var data
-    this._addOpMode('do')
+    this._addOpMode('do', opts)
     if (this.paginate) {
       return this.doPage()
     }
@@ -300,8 +292,10 @@ class Model {
 
   getOpMode () { return this.opMode }
 
-  _addOpMode (mode) {
-    this.logs.push(mode)
+  _addOpMode (mode, ...args) {
+    let el = {}
+    el[mode] = args
+    this.logs.push(el)
   }
 
   find (table, fields) {
@@ -352,7 +346,7 @@ class Model {
       pageSize = opts.limit || this.modelConfig.pageSize || 20
       offset = opts.offset
     }
-    this._addOpMode('page')
+    this._addOpMode('page', page, pageSize)
     if (page < 1) page = 1
     this.paginate = {
       page: page,
@@ -371,7 +365,7 @@ class Model {
   }
 
   join (table, where, alias) {
-    this._addOpMode('join')
+    this._addOpMode('join', table, where, alias)
     return this.runCatch(function () {
       this.query = this.query.join(table, alias, where)
       this.actionData.push({ join: [table, where, alias] })
@@ -380,7 +374,7 @@ class Model {
   }
 
   outerJoin (table, where, alias) {
-    this._addOpMode('outer_join')
+    this._addOpMode('outer_join', table, where, alias)
     return this.runCatch(function () {
       this.query = this.query.outer_join(table, alias, where)
       this.actionData.push({ outer_join: [table, where, alias] })
@@ -389,7 +383,7 @@ class Model {
   }
 
   leftJoin (table, where, alias) {
-    this._addOpMode('left_join')
+    this._addOpMode('left_join', table, where, alias)
     return this.runCatch(function () {
       this.query = this.query.left_join(table, alias, where)
       this.actionData.push({ left_join: [table, where, alias] })
@@ -404,7 +398,7 @@ class Model {
   }
 
   field (...args) {
-    this._addOpMode('field')
+    this._addOpMode('field', args)
     return this.runCatch(function () {
       this.query = this.query.field.apply(this, args)
       return this
@@ -412,7 +406,7 @@ class Model {
   }
 
   fields (opts) {
-    this.logs.push('fields')
+    this._addOpMode('fields', opts)
     try {
       this.query = this.query.fields(opts)
     } catch (e) {
@@ -422,7 +416,7 @@ class Model {
   }
 
   setFields (opts) {
-    this._addOpMode('setFields')
+    this._addOpMode('setFields', opts)
     return this.runCatch(function () {
       Object.keys(opts || {}).forEach(k => {
         let escaped = '`' + this.table + '`.`' + k + '`'
@@ -437,7 +431,7 @@ class Model {
   }
 
   limit (opts) {
-    this._addOpMode('limit')
+    this._addOpMode('limit', opts)
     return this.runCatch(function () {
       this.query = this.query.limit(opts)
       return this
@@ -445,7 +439,7 @@ class Model {
   }
 
   offset (opts) {
-    this._addOpMode('offset')
+    this._addOpMode('offset', opts)
     return this.runCatch(function () {
       this.query = this.query.offset(opts)
       return this
@@ -453,7 +447,7 @@ class Model {
   }
 
   order (...args) {
-    this._addOpMode('order')
+    this._addOpMode('order', args)
     return this.runCatch(function () {
       this.query = this.query.order.apply(this, args)
       return this
@@ -461,7 +455,7 @@ class Model {
   }
 
   group (by) {
-    this._addOpMode('group')
+    this._addOpMode('group', by)
     return this.runCatch(function () {
       this.query = this.query.group(by)
       return this
@@ -470,7 +464,7 @@ class Model {
 
   where (...args) {
     this.actionData.push({ where: args })
-    this._addOpMode('where')
+    this._addOpMode('where', args)
     return this.runCatch(function () {
       this.query = this.query.where.apply(this, args)
       return this

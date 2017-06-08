@@ -12,7 +12,8 @@ const internals = {
   },
   cachedModels: {},
   associations: new Map(),
-  hashString: (string) => { return crypto.createHash('md5').update(string).digest('hex') }
+  hashString: (string) => { return crypto.createHash('md5').update(string).digest('hex') },
+  eventHandlers: new Map()
 }
 
 class Model {
@@ -21,7 +22,7 @@ class Model {
       return this
     }
 
-    let eventListeners = new Map()
+    let eventListeners = this._setupGlobalListeners(eventListeners)
 
     this._getEventListeners = function () {
       return eventListeners
@@ -94,18 +95,17 @@ class Model {
     return this
   }
 
-/**
- * @param {String} event
- * @param {Function} handler after event handler will call with args : Model instance, returned operation data
- * @param {Object} scope
- * @memberof Model
- */
-  on (event, handler, scope) {
-    this._getEventListeners().set(event, {handler, scope})
+  _setupGlobalListeners () {
+    let eventListeners = new Map()
+    let _events = internals.eventHandlers.get(this.table)
+    if (Array.isArray(_events) && _events.length) {
+      Object.keys(_events).forEach(event => typeof (_events[event][0]) === 'function' && eventListeners.set(event, _events[event][0], _events[event][1]))
+    }
+    return eventListeners
   }
 
-  getListener (event) {
-    return this._getEventListeners().get(event)
+  static setupListeners (table, events) {
+    internals.eventHandlers.set(table, events)
   }
 
   consoleDebug (...args) {
@@ -177,6 +177,20 @@ class Model {
     }
   }
 
+  /**
+ * @param {String} event
+ * @param {Function} handler after event handler will call with args : Model instance, returned operation data
+ * @param {Object} scope
+ * @memberof Model
+ */
+  on (event, handler, scope) {
+    this._getEventListeners().set(event, {handler, scope})
+  }
+
+  getListener (event) {
+    return this._getEventListeners().get(event)
+  }
+
   async _doRequest (params) {
     this.consoleDebug(this.getOpMode())
     this.incrTable(JSON.stringify(params))
@@ -184,11 +198,14 @@ class Model {
       console.error('error while count total : %s\n', JSON.stringify(params), JSON.stringify(ex))
       throw ex
     })
-    let eventHandler = this.getListener(this.getOpMode())
-    console.log('operation event : ', this.getOpMode())
+    let event = this.getOpMode()
+    let eventAllHandler = this.getListener('*')
+    let eventHandler = this.getListener(event)
     if (eventHandler && typeof eventHandler.handler === 'function') {
-      console.log('operation handler : ', eventHandler.handler)
       eventHandler.handler.call(eventHandler.scope || this, this, data)
+    }
+    if (eventAllHandler && typeof eventAllHandler.handler === 'function') {
+      eventAllHandler.handler.call(eventAllHandler.scope || this, this, data)
     }
     return data
   }

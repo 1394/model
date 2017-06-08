@@ -175,21 +175,10 @@ class Model {
     let paramsTotal = this.query.clone().field(`COUNT(${this.table}.id) as count`).toParam()
     let paramsQuery = this.query.limit(this.paginate.limit).offset(this.paginate.offset).toString()
     let data
-    // try {
-      // data = await this.base.do(totalSql).catch(ex => { console.error(ex); throw ex })
     data = await this._doRequest(paramsTotal)
-    // } catch (ex) {
-    //   console.error('error while count total : %s\n', paramsTotal, JSON.stringify(ex))
-    //   throw ex
-    // }
     result.count = data[0].count
     result.pages = Math.ceil(result.count / this.paginate.limit)
-    // try {
     data = await this._doRequest(paramsQuery).catch(ex => { console.error(ex); throw ex })
-    // } catch (ex) {
-    //   console.error('error while request : %s\n', paramsQuery, JSON.stringify(ex))
-    //   throw ex
-    // }
     if (this.opMode === 'find') {
       if (this._processFn) {
         data = this.runCatch(function () {
@@ -214,7 +203,6 @@ class Model {
     requestString = this.query.toString()
     let params = this.query.toParam()
     try {
-      // data = await this.base.do({sql: params.text, values: params.values})
       data = await this._doRequest({sql: params.text, values: params.values})
     } catch (ex) {
       console.error('error while request : %s\n', requestString, JSON.stringify(ex))

@@ -187,6 +187,7 @@ class Model {
     let eventHandler = this.getListener(this.getOpMode())
     console.log('operation event : ', this.getOpMode())
     if (eventHandler && typeof eventHandler.handler === 'function') {
+      console.log('operation handler : ', eventHandler.handler)
       eventHandler.handler.call(eventHandler.scope || this, this, data)
     }
     return data

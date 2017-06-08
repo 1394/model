@@ -139,10 +139,11 @@ class Model {
     if (this.redis) {
       try {
         let key = internals.hashString(request)
-        console.log('key %s for request %s', key, request)
+        // console.log('key %s for request %s', key, request)
         await this.redis.hincrby('sqlTableCounts', this.table, 1)
         await this.redis.hincrby('sqlRequestCounts', key, 1)
         await this.redis.hset('sqlRequestKeys', this.table, key)
+        await this.redis.hset('sqlRequests', key, request)
       } catch (ex) {
         console.error(JSON.stringify(ex))
       }

@@ -306,7 +306,7 @@ class Model {
     el[mode] = args
     this.logs.push(el)
     this.operations[mode] = this.operations[mode] || []
-    if (args && args.length) {
+    if (args) {
       this.operations[mode].push(args)
     }
   }

@@ -70,6 +70,8 @@ class Model {
 
     this.logs = []
 
+    this.operations = {}
+
     this.showLog = function (e, args) {
       args ? this.logs.push(util.inspect(args), e) : this.showLog(e, arguments)
       console.log('\r\nError : ********************************************************')
@@ -286,11 +288,12 @@ class Model {
     return this.limit(1).do({ first: true })
   }
 
-  _setOpMode (mode) {
+  _setOpMode (mode, ...args) {
     this.paginate = false
     this.actionData = []
     this.opMode = mode
-    this.logs = [mode]
+    args.unshift(mode)
+    this._addOpMode.apply(this, args)
   }
 
   getOpMode () { return this.opMode }
@@ -299,10 +302,12 @@ class Model {
     let el = {}
     el[mode] = args
     this.logs.push(el)
+    this.operations[mode] = this.operations[mode] || []
+    this.operations[mode].push(args)
   }
 
   find (table, fields) {
-    this._setOpMode('find')
+    this._setOpMode('find', table, fields)
     fields = fields || '*'
     return this.runCatch(function () {
       this.query = table ? this.query.from(table).field(table + '.' + fields) : this.squel.select().from(this.table).field(this.table + '.' + fields)
@@ -311,7 +316,7 @@ class Model {
   }
 
   update (table) {
-    this._setOpMode('update')
+    this._setOpMode('update', table)
     return this.runCatch(function () {
       this.query = this.squel.update().table(table || this.table)
       this.action = 'update'
@@ -321,7 +326,7 @@ class Model {
   }
 
   insert (table) {
-    this._setOpMode('insert')
+    this._setOpMode('insert', table)
     return this.runCatch(function () {
       this.query = this.squel.insert().into(table || this.table)
       this.action = 'insert'
@@ -331,7 +336,7 @@ class Model {
   }
 
   delete (table) {
-    this._setOpMode('delete')
+    this._setOpMode('delete', table)
     return this.runCatch(function () {
       this.query = this.squel.delete().from(table || this.table)
       this.action = 'delete'

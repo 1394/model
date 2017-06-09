@@ -29,15 +29,18 @@ const internals = {
   events: new Map()
 }
 
-squel.whereSuper = Object.assign({}, squel.where)
-squel.where = function (...args) {
-  if (args && args.length === 1 && Object.keys(args[0]).length) {
+const whereConvert = function (args) {
+  console.log('squel.whereSuper = ', args)
+  if (args && args.length === 1 && typeof args[0] === 'object' && Object.keys(args[0]).length) {
+    console.log('has object = ', Object.keys(args[0]))
     args = args[0]
     let opts = ['']
     opts[0] = Object.keys(args).map(el => { opts.push(args[el]); return `${el} = ?` }).join(' AND ')
-    return squel.whereSuper.appy(squel, opts)
+    console.log('opts = ', JSON.stringify(opts))
+    return opts
   } else {
-    return squel.whereSuper.appy(squel, args)
+    console.log('has usual = ', args)
+    return args
   }
 }
 
@@ -492,8 +495,11 @@ class Model {
   }
 
   where (...args) {
-    this.actionData.push({ where: args })
+    console.log('before : ', args)
     this._addOpMode.apply(this, [].concat('where', args))
+    args = whereConvert(args)
+    console.log('after : ', args)
+    this.actionData.push({ where: args })
     return this.runCatch(function () {
       this.query = this.query.where.apply(this, args)
       return this
@@ -550,6 +556,5 @@ class Model {
   }
 
 }
-
 
 module.exports = Model

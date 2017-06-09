@@ -303,7 +303,9 @@ class Model {
     el[mode] = args
     this.logs.push(el)
     this.operations[mode] = this.operations[mode] || []
-    this.operations[mode].push(args)
+    if (args && args.length) {
+      this.operations[mode].push(args)
+    }
   }
 
   find (table, fields) {
@@ -406,7 +408,7 @@ class Model {
   }
 
   field (...args) {
-    this._addOpMode('field', args)
+    this._addOpMode.apply(this, [].concat('field', args))
     return this.runCatch(function () {
       this.query = this.query.field.apply(this, args)
       return this
@@ -455,7 +457,7 @@ class Model {
   }
 
   order (...args) {
-    this._addOpMode('order', args)
+    this._addOpMode.apply(this, [].concat('order', args))
     return this.runCatch(function () {
       this.query = this.query.order.apply(this, args)
       return this

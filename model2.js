@@ -299,6 +299,9 @@ class Model {
   getOpMode () { return this.opMode }
 
   _addOpMode (mode, ...args) {
+    if (args.length === 1) {
+      args = args[0]
+    }
     let el = {}
     el[mode] = args
     this.logs.push(el)

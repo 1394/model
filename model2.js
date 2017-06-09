@@ -39,6 +39,9 @@ class Model {
     this.eventProxy = internals.eventProxy
 
     this._Model = Model
+    this.clone = () => {
+      return new Model(table, cfg, dbname)
+    }
     this.modelConfig = cfg || {}
     this.action = ''
     this.actionData = []

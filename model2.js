@@ -472,7 +472,7 @@ class Model {
 
   where (...args) {
     this.actionData.push({ where: args })
-    this._addOpMode('where', args)
+    this._addOpMode.apply(this, [].concat('where', args))
     return this.runCatch(function () {
       this.query = this.query.where.apply(this, args)
       return this

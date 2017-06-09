@@ -4,7 +4,10 @@ const EventEmitter = require('events')
 
 class ModelEmitter extends EventEmitter {
   addEventHandler (table, event, handler, scope) {
-    this.on(table + '.' + event, handler.bind(scope))
+    let eventName = table + '.' + event
+    if (!this.listeners(eventName).length) {
+      this.on(eventName, handler.bind(scope))
+    }
   }
 }
 

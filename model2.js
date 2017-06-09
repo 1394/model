@@ -12,6 +12,7 @@ class ModelEmitter extends EventEmitter {
 }
 
 const util = require('util')
+const squel = require('squel')
 const crypto = require('crypto')
 const Record = require('./record')
 const internals = {
@@ -26,6 +27,18 @@ const internals = {
   hashString: (string) => { return crypto.createHash('md5').update(string).digest('hex') },
   eventProxy: new ModelEmitter(),
   events: new Map()
+}
+
+squel.whereSuper = Object.assign({}, squel.where)
+squel.where = function (...args) {
+  if (args && args.length === 1 && Object.keys(args[0]).length) {
+    args = args[0]
+    let opts = ['']
+    opts[0] = Object.keys(args).map(el => { opts.push(args[el]); return `${el} = ?` }).join(' AND ')
+    return squel.whereSuper.appy(squel, opts)
+  } else {
+    return squel.whereSuper.appy(squel, args)
+  }
 }
 
 class Model {
@@ -56,7 +69,7 @@ class Model {
     }
     this._setupGlobalListeners()// must be set table before call!!!
     this.dbConfig = internals.db_config[this.dbname]
-    this.squel = require('squel')
+    this.squel = squel
     this.df = require('dateformat')
     this.df.i18n = internals.i18n
     this.strftime = function (v, format) {

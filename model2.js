@@ -30,16 +30,12 @@ const internals = {
 }
 
 const whereConvert = function (args) {
-  console.log('squel.whereSuper = ', args)
   if (args && args.length === 1 && typeof args[0] === 'object' && Object.keys(args[0]).length) {
-    console.log('has object = ', Object.keys(args[0]))
     args = args[0]
     let opts = ['']
     opts[0] = Object.keys(args).map(el => { opts.push(args[el]); return `${el} = ?` }).join(' AND ')
-    console.log('opts = ', JSON.stringify(opts))
     return opts
   } else {
-    console.log('has usual = ', args)
     return args
   }
 }
@@ -239,6 +235,9 @@ class Model {
       console.error('error while count total : %s\n', JSON.stringify(params), JSON.stringify(ex))
       throw ex
     })
+    if (params.bypassEvents) {
+      return data
+    }
     let event = this.table + '.' + this.getOpMode()
     internals.eventProxy.emit(event, this, params, data)
     return data
@@ -254,6 +253,7 @@ class Model {
     }
     let result = { paginate: true }
     let paramsTotal = this.query.clone().field(`COUNT(${this.table}.id) as count`).toParam()
+    paramsTotal.bypassEvents = true
     let paramsQuery = this.query.limit(this.paginate.limit).offset(this.paginate.offset).toParam()
     let data
     data = await this._doRequest(paramsTotal)

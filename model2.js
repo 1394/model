@@ -295,7 +295,6 @@ class Model {
   }
 
   async _doRequest (params) {
-    console.log('async _doRequest : ', JSON.stringify(params))
     this.consoleDebug(this.getOpMode())
     this.incrTable(JSON.stringify(params))
     let data = await this.base.do({sql: params.text, values: params.values}).catch(ex => {

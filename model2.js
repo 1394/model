@@ -539,10 +539,8 @@ class Model {
   }
 
   where (...args) {
-    console.log('before : ', args)
     this._addOpMode.apply(this, [].concat('where', args))
     args = whereConvert(args)
-    console.log('after : ', args)
     this.actionData.push({ where: args })
     return this.runCatch(function () {
       this.query = this.query.where.apply(this, args)

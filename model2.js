@@ -120,7 +120,57 @@ class Model {
     }
     return this
   }
+/**
+ * helper methods SECTION
+ */
 
+/**
+ * initialize model internals
+ * @memberof Model
+ */
+  _resetModel () {
+    this.paginate = false
+    this.actionData = []
+    this.operations = {}
+    return this
+  }
+/**
+ * @param {String} mode start mode : find / insert / update / delete
+ * @param {any} args 
+ * @memberof Model
+ */
+  _setOpMode (mode, ...args) {
+    this._resetModel()
+    this.opMode = mode
+    args.unshift(mode)
+    this._addOpMode.apply(this, args)
+  }
+/**
+ * @returns {String} model start mode
+ * @memberof Model
+ */
+  getOpMode () { return this.opMode }
+/**
+ * @param {String} mode sql builder option
+ * @param {any} args 
+ * @memberof Model
+ */
+  _addOpMode (mode, ...args) {
+    if (args.length === 1) {
+      args = args[0]
+    }
+    let el = {}
+    el[mode] = args
+    this.logs.push(el)
+    this.operations[mode] = this.operations[mode] || []
+    if (args) {
+      this.operations[mode].push(args)
+    }
+  }
+/**
+ * bind event listeners to instance of model
+ * @memberof Model
+ */
   _setupGlobalListeners () {
     let _events = internals.events.get(this.table)
     if (typeof _events === 'object' && Object.keys(_events).length) {
@@ -134,7 +184,15 @@ class Model {
       })
     }
   }
-
+/**
+ * @static
+ * @param {String|Object} table table name if String, otherwise object where root keys is table names and values is event listeners config
+ * @param {Object} events event listeners config, for example {find: {handler: (params) => {someHandler(params)}, scope: someScope}}
+ * @param {Object|Function} events.find event listener or event listener config {handler: fn, scope: scope}
+ * @param {Function} events.find.handler
+ * @param {Object} events.find.scope
+ * @memberof Model
+ */
   static setupListeners (table, events) {
     if (!events) {
       Object.keys(table).forEach(key => {
@@ -144,13 +202,21 @@ class Model {
       internals.events.set(table, events)
     }
   }
-
+/**
+ * @param {any} args will log to console in debug mode
+ * @memberof Model
+ */
   consoleDebug (...args) {
     if (this.modelConfig.debug) {
       console.info.apply(this, args)
     }
   }
-
+/**
+ * @static
+ * @param {any} table 
+ * @param {any} assoc 
+ * @memberof Model
+ */
   static setAssoc (table, assoc) {
     if (internals.associations.has(table)) {
 
@@ -229,6 +295,7 @@ class Model {
   }
 
   async _doRequest (params) {
+    console.log('async _doRequest : ', JSON.stringify(params))
     this.consoleDebug(this.getOpMode())
     this.incrTable(JSON.stringify(params))
     let data = await this.base.do({sql: params.text, values: params.values}).catch(ex => {
@@ -305,29 +372,6 @@ class Model {
 
   first () {
     return this.limit(1).do({ first: true })
-  }
-
-  _setOpMode (mode, ...args) {
-    this.paginate = false
-    this.actionData = []
-    this.opMode = mode
-    args.unshift(mode)
-    this._addOpMode.apply(this, args)
-  }
-
-  getOpMode () { return this.opMode }
-
-  _addOpMode (mode, ...args) {
-    if (args.length === 1) {
-      args = args[0]
-    }
-    let el = {}
-    el[mode] = args
-    this.logs.push(el)
-    this.operations[mode] = this.operations[mode] || []
-    if (args) {
-      this.operations[mode].push(args)
-    }
   }
 
   find (table, fields) {
@@ -506,9 +550,12 @@ class Model {
     }, args)
   }
 
+  _wrapField (field) {
+    return '`' + this.table + '`.`' + field + '`'
+  }
+
   setKV (k, v) {
-    k = '`' + this.table + '`.`' + k + '`'
-    this.query = this.query.set(k, v)
+    this.query = this.query.set(this._wrapField(k), v)
     return this
   }
 
@@ -535,6 +582,11 @@ class Model {
           return me.insert().setFields(fieldsData).do()
         }
       })
+  }
+
+  findBy (field, values) {
+    this._resetModel().find().where(`${this._wrapField(field)} ${Array.isArray(values) ? 'IN' : '='} ?`, values)
+    return this
   }
 
   getFields () {

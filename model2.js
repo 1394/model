@@ -294,22 +294,39 @@ class Model {
     return this._getEventListeners().get(event)
   }
 
-  async _doRequest (params) {
-    // const me = this
-    this.consoleDebug(this.getOpMode())
-    this.incrTable(JSON.stringify(params))
-// TODO : cant make transactins because driver release connection right after get result from mysql
-    // if (this.getOpMode() === 'update') {
-    //   await this.base.do('BEGIN;').then(res => console.log('BEGIN;', res))
-    // }
-    let data = await this.base.do({sql: params.text, values: params.values}).catch(ex => {
+  async _doRequestUpdate (params) {
+    const me = this
+    let conn = await this.base.getConn()
+    if (!conn) {
+      console.error('error get db connection')
+      throw new Error('error get db connection')
+    }
+    await this.base.doConn(conn, 'BEGIN;').then(res => console.log('BEGIN;', res))
+    let data = await this.base.doConn(conn, {sql: params.text, values: params.values}).catch(ex => {
       console.error('error _doRequest : %s\n', JSON.stringify(params), JSON.stringify(ex))
-      // me.base.do('ROLLBACK;').then(res => console.log('ROLLBACK;', res))
+      me.base.doConn('ROLLBACK;').then(res => console.log('ROLLBACK;', res))
+      conn.release()
       throw ex
     })
-    // if (this.getOpMode() === 'update') {
-    //   await this.base.do('COMMIT;').then(res => console.log('COMMIT;', res))
-    // }
+    await this.base.doConn(conn, 'COMMIT;').then(res => console.log('COMMIT;', res))
+    if (params.bypassEvents) {
+      return data
+    }
+    let event = this.table + '.' + this.getOpMode()
+    internals.eventProxy.emit(event, this, params, data)
+    return data
+  }
+
+  async _doRequest (params) {
+    this.consoleDebug(this.getOpMode())
+    this.incrTable(JSON.stringify(params))
+    if (this.getOpMode() === 'update') {
+      return this._doRequestUpdate(params)
+    }
+    let data = await this.base.do({sql: params.text, values: params.values}).catch(ex => {
+      console.error('error _doRequest : %s\n', JSON.stringify(params), JSON.stringify(ex))
+      throw ex
+    })
     if (params.bypassEvents) {
       return data
     }

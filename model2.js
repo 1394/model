@@ -295,13 +295,15 @@ class Model {
   }
 
   async _doRequest (params) {
+    const me = this
     this.consoleDebug(this.getOpMode())
     this.incrTable(JSON.stringify(params))
     if (this.getOpMode() === 'update') {
       await this.base.do('BEGIN;').then(res => console.log('BEGIN;', res))
     }
     let data = await this.base.do({sql: params.text, values: params.values}).catch(ex => {
-      console.error('error while count total : %s\n', JSON.stringify(params), JSON.stringify(ex))
+      console.error('error _doRequest : %s\n', JSON.stringify(params), JSON.stringify(ex))
+      me.base.do('ROLLBACK;').then(res => console.log('ROLLBACK;', res))
       throw ex
     })
     if (this.getOpMode() === 'update') {

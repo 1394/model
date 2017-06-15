@@ -483,6 +483,15 @@ class Model {
     }, table, where, alias)
   }
 
+  leftOuterJoin (table, where, alias) {
+    this._addOpMode('left_outer_join', table, where, alias)
+    return this.runCatch(function () {
+      this.query = this.query.left_outer_join(table, alias, where)
+      this.actionData.push({ left_outer_join: [table, where, alias] })
+      return this
+    }, table, where, alias)
+  }
+
   leftJoin (table, where, alias) {
     this._addOpMode('left_join', table, where, alias)
     return this.runCatch(function () {

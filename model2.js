@@ -320,9 +320,9 @@ class Model {
   async _doRequest (params) {
     this.consoleDebug(this.getOpMode())
     this.incrTable(JSON.stringify(params))
-    if (this.getOpMode() === 'update') {
-      return this._doRequestUpdate(params)
-    }
+    // if (this.getOpMode() === 'update') {
+    //   return this._doRequestUpdate(params)
+    // }
     let data = await this.base.do({sql: params.text, values: params.values}).catch(ex => {
       console.error('error _doRequest : %s\n', JSON.stringify(params), JSON.stringify(ex))
       throw ex

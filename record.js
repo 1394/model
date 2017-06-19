@@ -105,10 +105,10 @@ class Record {
     this.isNew = () => { return newRecord }
     this.Model = options.model
     this.set = function (key, value) {
-      if (newRecord) {
-        config.row[key] = value
-      } else {
+      config.row[key] = value
+      if (!newRecord) {
         config.modified.set(key, value)
+        config.row[key] = value
       }
       return this
     }

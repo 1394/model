@@ -212,10 +212,22 @@ class Record {
  * @memberof Record
  */
   update () {
+    return this._getModel().update().where(`${this.owner.table}.id = ?`, this.get('id'))
+  }
+/**
+ * @returns {Promise} Model instance
+ * @memberof Record
+ */
+  save () {
+    const me = this
     if (this.modified()) {
-      return this._getModel().update().where(`${this.owner.table}.id = ?`, this.get('id')).setFields(this.modified())
+      return this._getModel().update().where(`${this.owner.table}.id = ?`, this.get('id')).setFields(this.modified()).do()
+        .then((res) => {
+          me._config().modified.clear()
+          return res
+        })
     } else {
-      return this._getModel().update().where(`${this.owner.table}.id = ?`, this.get('id'))
+      return Promise.resolve(me)
     }
   }
 /**

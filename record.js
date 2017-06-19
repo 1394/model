@@ -97,7 +97,7 @@ class Record {
       fields: options.fields || [],
       row: rowData,
       table: options.table,
-      modified: {},
+      modified: new Map(),
       keys: Object.keys(rowData)
     }
     this._config = () => config
@@ -108,10 +108,7 @@ class Record {
       if (newRecord) {
         config.row[key] = value
       } else {
-        if (!config.modified.hasOwnProperty(key) && config.row[key] !== value) {
-          config.modified[key] = this.has(key) ? config.row[key] : '_newValue'
-        }
-        config.row[key] = value
+        config.modified.set(key, value)
       }
       return this
     }
@@ -187,6 +184,19 @@ class Record {
  * @returns {Model} instance of Model
  * @memberof Record
  */
+  modified () {
+    if (this._config().modified.size === 0) {
+      return false
+    }
+    let data = {}
+    this._config().modified.forEach((i, key) => { data[key] = this._config().modified.get(key) })
+    return data
+  }
+/**
+ * @private
+ * @returns {Model} instance of Model
+ * @memberof Record
+ */
   _getModel () {
     return new this.Model(this.owner.table, this.owner.modelConfig, this.owner.dbname)
   }
@@ -202,7 +212,11 @@ class Record {
  * @memberof Record
  */
   update () {
-    return this._getModel().update().where(`${this.owner.table}.id = ?`, this.get('id'))
+    if (this.modified()) {
+      return this._getModel().update().where(`${this.owner.table}.id = ?`, this.get('id')).setFields(this.modified())
+    } else {
+      return this._getModel().update().where(`${this.owner.table}.id = ?`, this.get('id'))
+    }
   }
 /**
  * @returns {Promise} Model instance

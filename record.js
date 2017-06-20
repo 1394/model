@@ -98,32 +98,16 @@ class Record {
       row: rowData,
       table: options.table,
       modified: new Map(),
-      keys: Object.keys(rowData)
+      keys: new Set(Object.keys(rowData))
     }
-    this._config = () => config
     this.owner = options.owner
-    this.isNew = () => { return newRecord }
     this.Model = options.model
-    this.set = function (key, value) {
-      if (typeof key === 'string') {
-        config.row[key] = value
-        if (!newRecord) {
-          config.modified.set(key, value)
-          config.row[key] = value
-        }
-        return this
-      }
-      if (typeof key === 'object' && Object.keys(key).length && !value) {
-        for (let k of Object.keys(key)) {
-          this.set(k, key[k])
-        }
-        return this
-      }
-      console.error('key is must be string or hash {key: value}')
-      return this
-    }
-    this._data = function () { return config.row }
     this.attr = {}
+
+    this._config = () => config
+    this.isNew = () => newRecord
+    this._data = () => config.row
+
     for (let k of config.keys) {
       this.attr[k] = this.get(k)
     }
@@ -133,11 +117,38 @@ class Record {
     return this
   }
 /**
+ * @param {any} key 
+ * @param {any} value 
+ * @returns Record instance
+ * @memberof Record
+ */
+  set (key, value) {
+    if (typeof key === 'string') {
+      this._config().row[key] = value
+      if (!this.isNew()) {
+        this.has(key) && this._config().modified.set(key, value)
+        this._config().row[key] = value
+      }
+      return this
+    }
+    if (typeof key === 'object' && Object.keys(key).length && !value) {
+      for (let k of Object.keys(key)) {
+        this.set(k, key[k])
+      }
+      return this
+    }
+    console.error('key is must be string or hash {key: value}')
+    return this
+  }
+
+
+
+/**
  * @returns {Array} record fields
  * @memberof Record
  */
   keys () {
-    return this._config().keys
+    return [...this._config().keys]
   }
 /**
  * @param {String} key may be one field name or array of fields
@@ -145,7 +156,7 @@ class Record {
  * @memberof Record
  */
   has (fieldName) {
-    return this.keys().includes(fieldName) ? fieldName : false
+    return this._config().keys.has(fieldName) && fieldName
   }
 /**
  * get value or few values or whole record data

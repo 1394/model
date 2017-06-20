@@ -105,11 +105,21 @@ class Record {
     this.isNew = () => { return newRecord }
     this.Model = options.model
     this.set = function (key, value) {
-      config.row[key] = value
-      if (!newRecord) {
-        config.modified.set(key, value)
+      if (typeof key === 'string') {
         config.row[key] = value
+        if (!newRecord) {
+          config.modified.set(key, value)
+          config.row[key] = value
+        }
+        return this
       }
+      if (typeof key === 'object' && Object.keys(key).length && !value) {
+        for (let k of Object.keys(key)) {
+          this.set(k, key[k])
+        }
+        return this
+      }
+      console.error('key is must be string or hash {key: value}')
       return this
     }
     this._data = function () { return config.row }

@@ -124,9 +124,13 @@ class Record {
  */
   set (key, value) {
     if (typeof key === 'string') {
+      if (!this.has(key)) {
+        console.warn(`field : ${key} not found in model, ignore to set!`)
+        return this
+      }
       this._config().row[key] = value
       if (!this.isNew()) {
-        this.has(key) && this._config().modified.set(key, value)
+        this._config().modified.set(key, value)
         this._config().row[key] = value
       }
       return this

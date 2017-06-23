@@ -124,6 +124,19 @@ class Model {
  * helper methods SECTION
  */
 
+  util () {
+    return {
+// return array of numbered fields, for example fi('cp', 3, 0) will return ['cp0', 'cp1', 'cp2']
+      fi: (f, n, st = 1) => {
+        let res = []
+        for (let i = 0; i < n; i++) {
+          res.push(f + (st + i).toString())
+        }
+        return res
+      }
+    }
+  }
+
 /**
  * initialize model internals
  * @memberof Model

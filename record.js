@@ -117,8 +117,8 @@ class Record {
     return this
   }
 /**
- * @param {any} key 
- * @param {any} value 
+ * @param {any} key string or object, when object can be {name: 'name', ref_id: 3604}, for example item.set({name: 'name', ref_id: 3604}) will set name to 'name' and ref_id to 3604
+ * @param {any} value value of field
  * @returns Record instance
  * @memberof Record
  */

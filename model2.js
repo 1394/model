@@ -377,6 +377,7 @@ class Model {
   }
 
   async do (opts) {
+    const me = this
     opts = opts || {}
     opts.fields = opts.fields || this.modelConfig.fields
 
@@ -393,13 +394,17 @@ class Model {
           return this._processFn(data)
         }, opts)
       }
-
       if (opts.last) {
         return data.pop()
       }
       if (opts.first) {
         return data.shift()
       }
+    }
+// return newly created record as Record instance
+    if (this.opMode === 'insert' && data.insertId) {
+      let row = await this.find().where('id = ?', data.insertId).first()
+      return new Record(row, {processed: true, assoc: me.assocs.get(this.table), owner: me, model: Model})
     }
     return data
   }

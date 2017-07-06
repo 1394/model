@@ -249,10 +249,10 @@ class Record {
       return this._getModel().update().where(`${this.owner.table}.id = ?`, this.get('id')).setFields(this.modified()).do()
         .then((res) => {
           me._config().modified.clear()
-          return res
+          return me
         })
     } else {
-      return Promise.resolve(me)
+      return me
     }
   }
 /**

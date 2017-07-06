@@ -403,8 +403,7 @@ class Model {
     }
 // return newly created record as Record instance
     if (this.opMode === 'insert' && data.insertId) {
-      let row = await this.find().where('id = ?', data.insertId).first()
-      return new Record(row, {processed: true, assoc: me.assocs.get(this.table), owner: me, model: Model})
+      return this.find().where('id = ?', data.insertId).first()
     }
     return data
   }

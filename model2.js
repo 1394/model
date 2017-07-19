@@ -545,6 +545,10 @@ class Model {
   setFields (opts) {
     this._addOpMode('setFields', opts)
     return this.runCatch(function () {
+      if (typeof opts === 'string') {
+        this.query.set(opts)
+        return this
+      }
       Object.keys(opts || {}).forEach(k => {
         let escaped = '`' + this.table + '`.`' + k + '`'
         this.query.set(escaped, opts[k])

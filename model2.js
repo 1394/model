@@ -148,7 +148,7 @@ class Model {
   }
 /**
  * @param {String} mode start mode : find / insert / update / delete
- * @param {any} args 
+ * @param {any} args
  * @memberof Model
  */
   _setOpMode (mode, ...args) {
@@ -164,7 +164,7 @@ class Model {
   getOpMode () { return this.opMode }
 /**
  * @param {String} mode sql builder option
- * @param {any} args 
+ * @param {any} args
  * @memberof Model
  */
   _addOpMode (mode, ...args) {
@@ -225,8 +225,8 @@ class Model {
   }
 /**
  * @static
- * @param {any} table 
- * @param {any} assoc 
+ * @param {any} table
+ * @param {any} assoc
  * @memberof Model
  */
   static setAssoc (table, assoc) {
@@ -390,11 +390,11 @@ class Model {
     let params = this.query.toParam()
     data = await this._doRequest(params)
     let opMode = this.opMode
-    this._resetModel()
+    me._resetModel()
     if (opMode === 'find') {
       if (this._processFn) {
         data = this.runCatch(function () {
-          return this._processFn(data)
+          return me._processFn(data)
         }, opts)
       }
       if (opts.last) {
@@ -419,7 +419,7 @@ class Model {
     if (this.action === 'init') {
       this.find()
     }
-    if (whereArgs) {
+    if (whereArgs.length) {
       this.where(...whereArgs)
     }
     return this.limit(1).do({ first: true })
@@ -698,7 +698,6 @@ class Model {
       sql: `SHOW TABLES LIKE '${this.table}'`
     }).then(rows => rows[0])
   }
-
 }
 
 module.exports = Model

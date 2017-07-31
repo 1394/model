@@ -489,6 +489,9 @@ class Model {
   }
 
   count () {
+    if (this.action === 'init') {
+      this.find()
+    }
     this._addOpMode('count')
     return this.runCatch(function () {
       this.query = this.squel.select().from(this.table).field('COUNT(' + this.table + '.id) AS count')
@@ -497,6 +500,9 @@ class Model {
   }
 
   join (table, where, alias) {
+    if (this.action === 'init') {
+      this.find()
+    }
     this._addOpMode('join', table, where, alias)
     return this.runCatch(function () {
       this.query = this.query.join(table, alias, where)
@@ -506,6 +512,9 @@ class Model {
   }
 
   outerJoin (table, where, alias) {
+    if (this.action === 'init') {
+      this.find()
+    }
     this._addOpMode('outer_join', table, where, alias)
     return this.runCatch(function () {
       this.query = this.query.outer_join(table, alias, where)
@@ -515,6 +524,9 @@ class Model {
   }
 
   leftOuterJoin (table, where, alias) {
+    if (this.action === 'init') {
+      this.find()
+    }
     this._addOpMode('left_outer_join', table, where, alias)
     return this.runCatch(function () {
       this.query = this.query.left_outer_join(table, alias, where)
@@ -524,6 +536,9 @@ class Model {
   }
 
   leftJoin (table, where, alias) {
+    if (this.action === 'init') {
+      this.find()
+    }
     this._addOpMode('left_join', table, where, alias)
     return this.runCatch(function () {
       this.query = this.query.left_join(table, alias, where)
@@ -592,6 +607,9 @@ class Model {
   }
 
   order (...args) {
+    if (this.action === 'init') {
+      this.find()
+    }
     this._addOpMode.apply(this, [].concat('order', args))
     return this.runCatch(function () {
       this.query = this.query.order.apply(this, args)

@@ -141,7 +141,8 @@ class Model {
  */
   _resetModel () {
     this.paginate = false
-    this.action = 'init'
+    this.opMode = 'afterReset'
+    this.action = ''
     this.actionData = []
     this.operations = {}
     return this
@@ -416,7 +417,7 @@ class Model {
   }
 
   first (...whereArgs) {
-    if (this.action === 'init') {
+    if (this.getOpMode() === 'afterReset') {
       this.find()
     }
     if (whereArgs.length) {
@@ -471,7 +472,7 @@ class Model {
   }
 
   page (page, pageSize) {
-    if (this.action === 'init') {
+    if (this.getOpMode() === 'afterReset') {
       this.find()
     }
     pageSize = pageSize || this.modelConfig.pageSize || 20
@@ -493,7 +494,7 @@ class Model {
   }
 
   count () {
-    if (this.action === 'init') {
+    if (this.getOpMode() === 'afterReset') {
       this.find()
     }
     this._addOpMode('count')
@@ -504,7 +505,7 @@ class Model {
   }
 
   join (table, where, alias) {
-    if (this.action === 'init') {
+    if (this.getOpMode() === 'afterReset') {
       this.find()
     }
     this._addOpMode('join', table, where, alias)
@@ -516,7 +517,7 @@ class Model {
   }
 
   outerJoin (table, where, alias) {
-    if (this.action === 'init') {
+    if (this.getOpMode() === 'afterReset') {
       this.find()
     }
     this._addOpMode('outer_join', table, where, alias)
@@ -528,7 +529,7 @@ class Model {
   }
 
   leftOuterJoin (table, where, alias) {
-    if (this.action === 'init') {
+    if (this.getOpMode() === 'afterReset') {
       this.find()
     }
     this._addOpMode('left_outer_join', table, where, alias)
@@ -540,7 +541,7 @@ class Model {
   }
 
   leftJoin (table, where, alias) {
-    if (this.action === 'init') {
+    if (this.getOpMode() === 'afterReset') {
       this.find()
     }
     this._addOpMode('left_join', table, where, alias)
@@ -611,7 +612,7 @@ class Model {
   }
 
   order (...args) {
-    if (this.action === 'init') {
+    if (this.getOpMode() === 'afterReset') {
       this.find()
     }
     this._addOpMode.apply(this, [].concat('order', args))
@@ -630,7 +631,7 @@ class Model {
   }
 
   where (...args) {
-    if (this.action === 'init') {
+    if (this.getOpMode() === 'afterReset') {
       this.find()
     }
     this._addOpMode.apply(this, [].concat('where', args))

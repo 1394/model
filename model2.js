@@ -364,7 +364,9 @@ class Model {
     result.count = data[0].count
     result.pages = Math.ceil(result.count / this.paginate.limit)
     data = await this._doRequest(paramsQuery).catch(ex => { console.error(ex); throw ex })
-    if (this.opMode === 'find') {
+    let opMode = this.opMode
+    this._resetModel()
+    if (opMode === 'find') {
       if (this._processFn) {
         data = this.runCatch(function () {
           return this._processFn(data)
@@ -387,7 +389,9 @@ class Model {
     }
     let params = this.query.toParam()
     data = await this._doRequest(params)
-    if (this.opMode === 'find') {
+    let opMode = this.opMode
+    this._resetModel()
+    if (opMode === 'find') {
       if (this._processFn) {
         data = this.runCatch(function () {
           return this._processFn(data)

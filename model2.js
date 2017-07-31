@@ -55,8 +55,6 @@ class Model {
       return new Model(table, cfg, dbname)
     }
     this.modelConfig = cfg || {}
-    this.action = ''
-    this.actionData = []
     this.redis = internals.redis
     this.table = table
     this.dbname = dbname || internals.default_db_name
@@ -85,7 +83,7 @@ class Model {
 
     this.logs = []
 
-    this.operations = {}
+    this._resetModel()
 
     this.showLog = function (e, args) {
       args ? this.logs.push(util.inspect(args), e) : this.showLog(e, arguments)
@@ -143,6 +141,7 @@ class Model {
  */
   _resetModel () {
     this.paginate = false
+    this.action = 'init'
     this.actionData = []
     this.operations = {}
     return this
@@ -412,7 +411,13 @@ class Model {
     return this.first()
   }
 
-  first () {
+  first (...whereArgs) {
+    if (this.action === 'init') {
+      this.find()
+    }
+    if (whereArgs) {
+      this.where(...whereArgs)
+    }
     return this.limit(1).do({ first: true })
   }
 
@@ -425,37 +430,46 @@ class Model {
     }, table, fields)
   }
 
-  update (table) {
-    this._setOpMode('update', table)
+  update (data) {
+    this._setOpMode('update', data)
     return this.runCatch(function () {
-      this.query = this.squel.update().table(table || this.table)
+      this.query = this.squel.update().table(this.table)
+      if (data && typeof data === 'object' && Object.keys(data).length) {
+        this.setFields(data)
+      }
       this.action = 'update'
-      this.actionData = []
+      this.actionData = data ? [data] : []
       return this
-    }, table)
+    }, data)
   }
 
-  insert (table) {
-    this._setOpMode('insert', table)
+  insert (data) {
+    this._setOpMode('insert', data)
     return this.runCatch(function () {
-      this.query = this.squel.insert().into(table || this.table)
+      this.query = this.squel.insert().into(this.table)
+      if (data && typeof data === 'object' && Object.keys(data).length) {
+        this.setFields(data)
+      }
       this.action = 'insert'
-      this.actionData = []
+      this.actionData = data ? [data] : []
       return this
-    }, table)
+    }, data)
   }
 
-  delete (table) {
-    this._setOpMode('delete', table)
+  delete () {
+    this._setOpMode('delete')
     return this.runCatch(function () {
-      this.query = this.squel.delete().from(table || this.table)
+      this.query = this.squel.delete().from(this.table)
       this.action = 'delete'
       this.actionData = []
       return this
-    }, table)
+    })
   }
 
   page (page, pageSize) {
+    if (this.action === 'init') {
+      this.find()
+    }
     pageSize = pageSize || this.modelConfig.pageSize || 20
     let offset
     if (typeof page === 'object') {
@@ -594,6 +608,9 @@ class Model {
   }
 
   where (...args) {
+    if (this.action === 'init') {
+      this.find()
+    }
     this._addOpMode.apply(this, [].concat('where', args))
     args = whereConvert(args)
     this.actionData.push({ where: args })

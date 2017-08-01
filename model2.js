@@ -498,10 +498,10 @@ class Model {
       this.find()
     }
     this._addOpMode('count')
-    return this.runCatch(function () {
-      this.query = this.squel.select().from(this.table).field('COUNT(' + this.table + '.id) AS count')
-      return this.do().then(data => data[0].count)
-    })
+    // return this.runCatch(function () {
+    this.query = this.squel.select().from(this.table).field('COUNT(' + this.table + '.id) AS count')
+    return this.do().then(data => data[0].count)
+    // })
   }
 
   join (table, where, alias) {

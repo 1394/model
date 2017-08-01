@@ -498,7 +498,7 @@ class Model {
       this.find()
     }
     this._addOpMode('count')
-    this.query = this.squel.select().from(this.table).field('COUNT(' + this.table + '.id) AS count')
+    this.query = this.field('COUNT(' + this.table + '.id) AS count')
     return this.do().then(data => data.shift().get('count'))
   }
 

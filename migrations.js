@@ -68,7 +68,7 @@ class Migrations {
       throw new Error('database name cant be empty')
     }
     let sql = `CREATE DATABASE IF NOT EXISTS \`${name}\` DEFAULT CHARACTER SET ${options.charset} DEFAULT COLLATE ${options.collate}`
-    return await this.Table.base.serviceConn(sql).catch(e => { me.error(e); throw e })
+    return this.Table.base.serviceConn(sql).catch(e => { me.error(e); throw e })
   }
 
   async create (options) {

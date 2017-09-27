@@ -36,7 +36,7 @@ function Model (table, cfg = {}, dbname) {
   this.actionData = []
   this.redis = internals.redis
   this.table = table
-  this.dbname = dbname || internals.default_db_name
+  this.dbname = dbname || cfg.db || internals.default_db_name
   if (!this.dbname) {
     console.log('default_db_name = ', internals.default_db_name)
     console.log('db_config = ')

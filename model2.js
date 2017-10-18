@@ -709,10 +709,11 @@ class Model {
 
   with (scope, ...arg) {
     if (typeof arg[0] === 'function') {
-      internals.withOptions[scope] = arg[0]
+      internals.withOptions[this.table] = internals.withOptions[this.table] || {}
+      internals.withOptions[this.table][scope] = arg[0]
       return this
     }
-    let fn = internals.withOptions[scope]
+    let fn = internals.withOptions[this.table] && internals.withOptions[this.table][scope]
     if (fn) {
       arg = arg || []
       arg.unshift(this)

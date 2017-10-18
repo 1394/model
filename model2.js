@@ -16,6 +16,7 @@ const squel = require('squel')
 const crypto = require('crypto')
 const Record = require('./record')
 const internals = {
+  withOptions: {},
   db_config: {},
   version: require('./package').version,
   i18n: {
@@ -57,7 +58,7 @@ class Model {
     this.modelConfig = cfg || {}
     this.redis = internals.redis
     this.table = table
-    this.dbname = dbname || internals.default_db_name
+    this.dbname = dbname || cfg.db || internals.default_db_name
     if (!this.dbname) {
       console.log('default_db_name = ', internals.default_db_name)
       console.log('db_config = ')
@@ -696,6 +697,28 @@ class Model {
     return this.base.do({
       sql: `SHOW TABLES LIKE '${this.table}'`
     }).then(rows => rows[0])
+  }
+
+/**
+ * @param {string} scope scope name
+ * @param {function} arg if function then Model.with set scope with name and scope function
+ * @param {arguments} arg if arguments and first is not a function then call scope by name with given arguments
+ * @example with arrow function : Model.with('active', (model,state) => model.where('active = ?', state)) and for use Model.with('active', 1)
+ * @example with usual function : Model.with('active', function(model,state) {return model.where('active = ?', state)}) and for use Model.with('active', 1)
+ */
+
+  with (scope, ...arg) {
+    if (typeof arg[0] === 'function') {
+      internals.withOptions[scope] = arg[0]
+      return this
+    }
+    let fn = internals.withOptions[scope]
+    if (fn) {
+      arg = arg || []
+      arg.unshift(this)
+      return fn.apply(this, arg)
+    }
+    return this
   }
 }
 

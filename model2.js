@@ -700,13 +700,14 @@ class Model {
   }
 
 /**
+ * @
+ * @description set scope from any Model methods or apply scope methods (all scopes stored globally in Model class and all instances has access to scopes)
  * @param {string} scope scope name
  * @param {function} arg if function then Model.with set scope with name and scope function
  * @param {arguments} arg if arguments and first is not a function then call scope by name with given arguments
  * @example with arrow function : Model.with('active', (model,state) => model.where('active = ?', state)) and for use Model.with('active', 1)
  * @example with usual function : Model.with('active', function(model,state) {return model.where('active = ?', state)}) and for use Model.with('active', 1)
  */
-
   with (scope, ...arg) {
     if (typeof arg[0] === 'function') {
       internals.withOptions[this.table] = internals.withOptions[this.table] || {}
@@ -714,6 +715,23 @@ class Model {
       return this
     }
     let fn = internals.withOptions[this.table] && internals.withOptions[this.table][scope]
+    if (fn) {
+      arg = arg || []
+      arg.unshift(this)
+      return fn.apply(this, arg)
+    }
+    return this
+  }
+/**
+ * @description get scope from another table
+ * @param {string} table table name
+ * @param {string} scope scope name
+ * @param {arguments} arg if arguments and first is not a function then call scope by name with given arguments
+ * @example Item.withOther('protos', 'where:protos:active')
+ */
+
+  withOther (table, scope, ...arg) {
+    let fn = internals.withOptions[table] && internals.withOptions[table][scope]
     if (fn) {
       arg = arg || []
       arg.unshift(this)

@@ -123,6 +123,10 @@ class Model {
  * helper methods SECTION
  */
 
+  static create (table, cfg = {}, dbname) {
+    return new this(table, cfg = {}, dbname)
+  }
+
   static util () {
     return {
 // return array of numbered fields, for example fi('cp', 3, 0) will return ['cp0', 'cp1', 'cp2']

@@ -124,7 +124,7 @@ class Model {
  */
 
   static create (table, cfg = {}, dbname) {
-    return new this(table, cfg = {}, dbname)
+    return () => new this(table, cfg = {}, dbname)
   }
 
   static util () {

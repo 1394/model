@@ -435,8 +435,13 @@ class Model {
     this._setOpMode('find', table, fields)
     fields = fields || '*'
     return this.runCatch(function () {
-      this.query = table ? this.query.from(table).field(table + '.' + fields) : this.squel.select().from(this.table).field(this.table + '.' + fields)
-      return this
+      if (typeof table === 'object' && table.fields && table.fields.length) {
+        this.query = this.squel.select().from(this.table).field(table.fields)
+        return this
+      } else {
+        this.query = table ? this.query.from(table).field(table + '.' + fields) : this.squel.select().from(this.table).field(this.table + '.' + fields)
+        return this
+      }
     }, table, fields)
   }
 

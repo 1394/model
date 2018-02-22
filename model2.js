@@ -437,7 +437,7 @@ class Model {
     return this.runCatch(function () {
       if (typeof table === 'object' && table.fields && table.fields.length) {
         if (Array.isArray(table.fields)) {
-          table.fields = table.fields.map(f => this.table + '.' + f)
+          table.fields = table.fields.map(f => this.table + '.' + f).join(',')
         }
         this.query = this.squel.select().from(this.table).field(table.fields)
         return this

@@ -641,6 +641,14 @@ class Model {
     }, by)
   }
 
+  having (...args) {
+    this._addOpMode.apply(this, [].concat('having', args))
+    return this.runCatch(function () {
+      this.query = this.query.where.apply(this, args)
+      return this
+    }, args)
+  }
+
   where (...args) {
     if (this.getOpMode() === 'afterReset') {
       this.find()

@@ -644,7 +644,7 @@ class Model {
   having (...args) {
     this._addOpMode.apply(this, [].concat('having', args))
     return this.runCatch(function () {
-      this.query = this.query.where.apply(this, args)
+      this.query = this.query.having.apply(this, args)
       return this
     }, args)
   }

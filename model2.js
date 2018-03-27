@@ -108,7 +108,7 @@ class Model {
     this.query = ''
 
     var me = this
-    if (!cfg.oldMode) {
+    if (!cfg.oldMode || !cfg.raw) {
       this.setProcessDataCallback(function (rows) {
         return Array.isArray(rows) ? rows.map(row => new Record(row, {processed: true, assoc: me.assocs.get(this.table), owner: me, model: Model})) : new Record(rows, {processed: true, assoc: me.assocs.get(this.table), owner: me, model: Model})
       })

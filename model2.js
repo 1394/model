@@ -125,7 +125,11 @@ class Model {
  */
 
   static create (table, cfg = {}, dbname) {
-    cfg.debug && console.log('create table %s with config: %s', table, cfg)
+    if (cfg.debug) {
+      console.log('*'.repeat(100))
+      console.log('create table %s with config:', table)
+      console.dir(dir)
+    }
     return () => new this(table, cfg, dbname)
   }
 

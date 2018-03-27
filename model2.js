@@ -125,6 +125,7 @@ class Model {
  */
 
   static create (table, cfg = {}, dbname) {
+    cfg.debug && console.log('create table %s with config: %s', table, cfg)
     return () => new this(table, cfg, dbname)
   }
 

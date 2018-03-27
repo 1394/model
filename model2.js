@@ -109,6 +109,7 @@ class Model {
 
     var me = this
     if (!cfg.oldMode && !cfg.raw) {
+      cfg.debug && console.log(this.table, ' used data cb callback, cfg: ', cfg)
       this.setProcessDataCallback(function (rows) {
         return Array.isArray(rows) ? rows.map(row => new Record(row, {processed: true, assoc: me.assocs.get(this.table), owner: me, model: Model})) : new Record(rows, {processed: true, assoc: me.assocs.get(this.table), owner: me, model: Model})
       })
@@ -244,7 +245,7 @@ class Model {
   }
 
   static setConfig (cfg) {
-    console.log('Model2 version : ', internals.version)
+    console.log('actual Model2 version : ', internals.version)
     if (!Array.isArray(cfg)) {
       cfg = [cfg]
     }

@@ -128,7 +128,7 @@ class Model {
     if (cfg.debug) {
       console.log('*'.repeat(100))
       console.log('create table %s with config:', table)
-      console.dir(dir)
+      console.dir(cfg)
     }
     return () => new this(table, cfg, dbname)
   }

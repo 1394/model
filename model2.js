@@ -108,7 +108,7 @@ class Model {
     this.query = ''
 
     var me = this
-    if (!cfg.oldMode || !cfg.raw) {
+    if (!cfg.oldMode && !cfg.raw) {
       this.setProcessDataCallback(function (rows) {
         return Array.isArray(rows) ? rows.map(row => new Record(row, {processed: true, assoc: me.assocs.get(this.table), owner: me, model: Model})) : new Record(rows, {processed: true, assoc: me.assocs.get(this.table), owner: me, model: Model})
       })
@@ -244,6 +244,7 @@ class Model {
   }
 
   static setConfig (cfg) {
+    console.log('Model2 version : ', internals.version)
     if (!Array.isArray(cfg)) {
       cfg = [cfg]
     }

@@ -124,7 +124,7 @@ class Model {
     }
     return this
   }
-/**
+  /**
  * helper methods SECTION
  */
 
@@ -139,7 +139,7 @@ class Model {
 
   static util () {
     return {
-// return array of numbered fields, for example fi('cp', 3, 0) will return ['cp0', 'cp1', 'cp2']
+      // return array of numbered fields, for example fi('cp', 3, 0) will return ['cp0', 'cp1', 'cp2']
       fi: (f, n, st = 1) => {
         let res = []
         for (let i = 0; i < n; i++) {
@@ -150,7 +150,7 @@ class Model {
     }
   }
 
-/**
+  /**
  * initialize model internals
  * @memberof Model
  */
@@ -162,7 +162,7 @@ class Model {
     this.operations = {}
     return this
   }
-/**
+  /**
  * @param {String} mode start mode : find / insert / update / delete
  * @param {any} args
  * @memberof Model
@@ -173,12 +173,12 @@ class Model {
     args.unshift(mode)
     this._addOpMode.apply(this, args)
   }
-/**
+  /**
  * @returns {String} model start mode
  * @memberof Model
  */
   getOpMode () { return this.opMode }
-/**
+  /**
  * @param {String} mode sql builder option
  * @param {any} args
  * @memberof Model
@@ -195,7 +195,7 @@ class Model {
       this.operations[mode].push(args)
     }
   }
-/**
+  /**
  * bind event listeners to instance of model
  * @memberof Model
  */
@@ -212,7 +212,7 @@ class Model {
       })
     }
   }
-/**
+  /**
  * @static
  * @param {String|Object} table table name if String, otherwise object where root keys is table names and values is event listeners config
  * @param {Object} events event listeners config, for example {find: {handler: (params) => {someHandler(params)}, scope: someScope}}
@@ -230,7 +230,7 @@ class Model {
       internals.events.set(table, events)
     }
   }
-/**
+  /**
  * @param {any} args will log to console in debug mode
  * @memberof Model
  */
@@ -239,7 +239,7 @@ class Model {
       console.info.apply(this, args)
     }
   }
-/**
+  /**
  * @static
  * @param {any} table
  * @param {any} assoc
@@ -364,13 +364,13 @@ class Model {
     return data
   }
 
-  async doPage (page, limit) {
-    this._addOpMode('doPage', page, limit)
-    if (page) {
-      this.page(page, limit)
+  async doPage (opts) {
+    this._addOpMode('doPage', opts)
+    if (opts.page) {
+      this.page(opts.page, opts.limit)
     }
     if (!this.paginate) {
-      throw new Error('cant do paginate while paging is not configured, try call .page(number) or .doPage(number)!')
+      throw new Error('cant do paginate while paging is not configured, try call .page(number) or .doPage({page: number})!')
     }
     let result = { paginate: true }
     let paramsTotal = this.query.clone().field(`COUNT(${this.table}.id) as count`).toParam()
@@ -384,16 +384,21 @@ class Model {
     let opMode = this.opMode
     this._resetModel()
     if (opMode === 'find') {
-      if (this._processFn) {
+      if (this._processFn && !opts.raw) {
         data = this.runCatch(function () {
           return this._processFn(data)
-        }, page, limit)
+        }, opts)
       }
     }
     result.rows = data
     return result
   }
 
+  /**
+  *
+  * @param {*} opts
+  * @param {*} opts.raw - dont process rows
+  */
   async do (opts) {
     const me = this
     opts = opts || {}
@@ -409,7 +414,7 @@ class Model {
     let opMode = this.opMode
     me._resetModel()
     if (opMode === 'find') {
-      if (this._processFn) {
+      if (this._processFn && !opts.raw) {
         data = this.runCatch(function () {
           return me._processFn(data)
         }, opts)
@@ -421,7 +426,7 @@ class Model {
         return data.shift()
       }
     }
-// return newly created record as Record instance
+    // return newly created record as Record instance
     if (this.opMode === 'insert' && data.insertId) {
       return this.find().where('id = ?', data.insertId).first()
     }
@@ -682,7 +687,7 @@ class Model {
     return this
   }
 
-/**
+  /**
 ## [starter method] - this method must be first at chain because is initialized inner 'squel' var
 @method Model.upsert
 @param {Object} fieldSet hash keys as field names and values
@@ -730,7 +735,7 @@ class Model {
     }).then(rows => rows[0])
   }
 
-/**
+  /**
  * @
  * @description set scope from any Model methods or apply scope methods (all scopes stored globally in Model class and all instances has access to scopes)
  * @param {string} scope scope name
@@ -753,7 +758,7 @@ class Model {
     }
     return this
   }
-/**
+  /**
  * @description get scope from another table
  * @param {string} table table name
  * @param {string} scope scope name

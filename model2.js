@@ -459,6 +459,7 @@ class Model {
         field = this.table + '.' + field + ' as count'
       }
       this.query = this.squel.select().from(this.table).field(field)
+      return this
     }, field)
   }
 
@@ -537,14 +538,14 @@ class Model {
     return this
   }
 
-  count () {
-    if (this.getOpMode() === 'afterReset') {
-      this.find()
-    }
-    this._addOpMode('count')
-    this.query = this.field('COUNT(' + this.table + '.id) AS count')
-    return this.do().then(data => data.shift().get('count'))
-  }
+  // count () {
+  //   if (this.getOpMode() === 'afterReset') {
+  //     this.find()
+  //   }
+  //   this._addOpMode('count')
+  //   this.query = this.field('COUNT(' + this.table + '.id) AS count')
+  //   return this.do().then(data => data.shift().get('count'))
+  // }
 
   join (table, where, alias) {
     if (this.getOpMode() === 'afterReset') {

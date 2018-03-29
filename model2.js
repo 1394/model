@@ -413,6 +413,9 @@ class Model {
     data = await this._doRequest(params)
     let opMode = this.opMode
     me._resetModel()
+    if (this.operations.count) {
+      return data[0].count
+    }
     if (opMode === 'find') {
       if (this._processFn && !opts.raw) {
         data = this.runCatch(function () {
@@ -429,9 +432,6 @@ class Model {
     // return newly created record as Record instance
     if (this.opMode === 'insert' && data.insertId) {
       return this.find().where('id = ?', data.insertId).first()
-    }
-    if (this.operations.count) {
-      return data[0].count
     }
     return data
   }

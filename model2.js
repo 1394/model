@@ -413,10 +413,7 @@ class Model {
     data = await this._doRequest(params)
     let opMode = this.opMode
     me._resetModel()
-    // if (this.debug) {
-    console.log('operations = ', this.operations, opMode)
-    // }
-    if (this.operations.count) {
+    if (opMode === 'count') {
       return data[0].count
     }
     if (opMode === 'find') {

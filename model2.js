@@ -430,7 +430,7 @@ class Model {
     if (this.opMode === 'insert' && data.insertId) {
       return this.find().where('id = ?', data.insertId).first()
     }
-    if (this.opMode === 'count') {
+    if (this.operations.count) {
       return data[0].count
     }
     return data

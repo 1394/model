@@ -414,7 +414,7 @@ class Model {
     let opMode = this.opMode
     me._resetModel()
     // if (this.debug) {
-    console.log('operations = ', this.operations)
+    console.log('operations = ', this.operations, opMode)
     // }
     if (this.operations.count) {
       return data[0].count

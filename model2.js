@@ -454,9 +454,9 @@ class Model {
     this._setOpMode('count', field)
     return this.runCatch(function () {
       if (field.includes('.')) {
-        field = field + ' as count'
+        field = `COUNT(${field}) as count`
       } else {
-        field = this.table + '.' + field + ' as count'
+        field = `COUNT(${this.table}.${field}) as count`
       }
       this.query = this.squel.select().from(this.table).field(field)
       return this

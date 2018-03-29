@@ -430,6 +430,9 @@ class Model {
     if (this.opMode === 'insert' && data.insertId) {
       return this.find().where('id = ?', data.insertId).first()
     }
+    if (this.opMode === 'count') {
+      return data[0].count
+    }
     return data
   }
 
@@ -445,6 +448,18 @@ class Model {
       this.where(...whereArgs)
     }
     return this.limit(1).do({ first: true })
+  }
+
+  count (field = 'id') {
+    this._setOpMode('count', field)
+    return this.runCatch(function () {
+      if (field.includes('.')) {
+        field = field + ' as count'
+      } else {
+        field = this.table + '.' + field + ' as count'
+      }
+      this.query = this.squel.select().from(this.table).field(field)
+    }, field)
   }
 
   find (table, fields) {

@@ -364,7 +364,7 @@ class Model {
     return data
   }
 
-  async doPage (opts) {
+  async doPage (opts = {}) {
     this._addOpMode('doPage', opts)
     if (opts.page) {
       this.page(opts.page, opts.limit)

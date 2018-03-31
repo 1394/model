@@ -371,6 +371,9 @@ class Model {
 
   async doPage (opts = {}) {
     this._addOpMode('doPage', opts)
+    if (Number.isSafeInteger(opts.offset) && Number.isSafeInteger(opts.limit)) {
+      opts.page = Math.round(opts.offset / opts.limit) + 1
+    }
     if (opts.page) {
       this.page(opts.page, opts.limit)
     }

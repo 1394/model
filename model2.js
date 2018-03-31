@@ -47,6 +47,8 @@ class Model {
       return this
     }
 
+    this.debug = cfg.debug
+
     this.assocs = internals.associations
 
     this.eventProxy = internals.eventProxy
@@ -185,7 +187,7 @@ class Model {
  */
   _addOpMode (mode, ...args) {
     if (this.debug) {
-      console.debug('addOpMode : %s, args : ', mode, ...args)
+      console.log('addOpMode : %s, args : ', mode, ...args)
     }
     if (args.length === 1) {
       args = args[0]
@@ -373,6 +375,9 @@ class Model {
       this.page(opts.page, opts.limit)
     }
     if (!this.paginate) {
+      if (this.debug) {
+        console.log('context before throw : ', this)
+      }
       throw new Error('cant do paginate while paging is not configured, try call .page(number) or .doPage({page: number})!')
     }
     let result = { paginate: true }

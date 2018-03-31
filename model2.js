@@ -184,6 +184,9 @@ class Model {
  * @memberof Model
  */
   _addOpMode (mode, ...args) {
+    if (this.debug) {
+      console.debug('addOpMode : %s, args : ', mode, ...args)
+    }
     if (args.length === 1) {
       args = args[0]
     }

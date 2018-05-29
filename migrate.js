@@ -61,10 +61,10 @@ if (mode === 'up' && !name) {
   check().then(() => {
     process.exit(0)
   })
-  .catch(err => {
-    console.error(err)
-    process.exit(1)
-  })
+    .catch(err => {
+      console.error(err)
+      process.exit(1)
+    })
 }
 
 if (mode === 'down' && !name) {
@@ -106,10 +106,10 @@ if (mode === 'down' && !name) {
     res && console.log(res)
     process.exit(0)
   })
-  .catch(err => {
-    console.error(err)
-    process.exit(1)
-  })
+    .catch(err => {
+      console.error(err)
+      process.exit(1)
+    })
 }
 
 if (mode === 'create' && name) {

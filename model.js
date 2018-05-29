@@ -146,7 +146,7 @@ Model.prototype.do = function (opts) {
   var me = this
   var requestString = ''
 
-  return co(function*() {
+  return co(function* () {
     var data
     if (me.paginate) {
       var result = { paginate: true }
@@ -174,7 +174,7 @@ Model.prototype.do = function (opts) {
         yield me.redis.hset('sqlRequestTables', key, me.table)
         let existReq = yield me.redis.get(`r.${key}`)
         if (existReq) {
-          let cachedData = yield me.redis.hget('sqlRequestCache', key)
+          yield me.redis.hget('sqlRequestCache', key)
         } else {
           yield me.redis.set(`r.${key}`, 'EX', 120)
         }
@@ -262,7 +262,7 @@ Model.prototype.end = function (opts) {
   opts.fields = opts.fields || this.modelConfig.fields
   var me = this
 
-  return co(function*() {
+  return co(function *() {
     var data
     if (me.paginate) {
       var result = { paginate: true }
@@ -274,7 +274,7 @@ Model.prototype.end = function (opts) {
       data = yield me.base.do(query)
 
       // instance Field
-      if (util.isArray(data)) {
+      if (Array.isArray(data)) {
         data = data.map(row => {
           return new Field({ model: me, data: row, _model: Model, fields: opts.fields })
         })
@@ -289,16 +289,16 @@ Model.prototype.end = function (opts) {
     }
     data = yield me.base.do(me.query.toString())
 
-      // instance Field
-    if (util.isArray(data)) {
+    // instance Field
+    if (Array.isArray(data)) {
       data = data.map(row => {
         return new Field({ model: me, data: row, _model: Model, fields: opts.fields })
       })
     }
 
-      // if(opts.fields && typeof opts.fields === 'object' && opts.fields.length){
-      //   data = me.processFields( data, opts.fields)
-      // }
+    // if(opts.fields && typeof opts.fields === 'object' && opts.fields.length){
+    //   data = me.processFields(data, opts.fields)
+    // }
 
     if (opts.last) return data[data.length - 1]
     if (opts.first) return data[0]
@@ -332,7 +332,7 @@ Model.prototype.cached = function cached (opts, promised) {
     opts = { key: opts, ttl: 60 * 60 }
   }
   const redis = this.redis
-  return co(function*() {
+  return co(function* () {
     if (!opts.key) {
       console.error('key can`t be empty!')
       throw new Error('key can`t be empty!')

@@ -94,7 +94,7 @@ class Migrations {
     }
     cfg.columns = options.columns.map(internals.prepareColumn)
     if (!cfg.columns.length) {
-// TODO : need refactoring
+      // TODO : need refactoring
       cfg.columns = this.getColumns().map(el => { el = el.split(' '); el.shift(); return el.join(' ') })
     }
     cfg.columns = '(' + cfg.columns.join(',') + ')'

@@ -70,6 +70,9 @@ class Model {
     this._setupGlobalListeners()// must be set table before call!!!
     this.dbConfig = internals.db_config[this.dbname]
     this.squel = squel
+    this.squel.registerValueHandler(Date, d => {
+      return d
+    })
     this.df = require('dateformat')
     this.df.i18n = internals.i18n
     this.strftime = function (v, format) {

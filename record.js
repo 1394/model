@@ -116,7 +116,7 @@ class Record {
     }
     return this
   }
-/**
+  /**
  * @param {any} key string or object, when object can be {name: 'name', ref_id: 3604}, for example item.set({name: 'name', ref_id: 3604}) will set name to 'name' and ref_id to 3604
  * @param {any} value value of field
  * @returns Record instance
@@ -145,16 +145,14 @@ class Record {
     return this
   }
 
-
-
-/**
+  /**
  * @returns {Array} record fields
  * @memberof Record
  */
   keys () {
     return [...this._config().keys]
   }
-/**
+  /**
  * @param {String} key may be one field name or array of fields
  * @return {false|String} field if record has field, otherwise false
  * @memberof Record
@@ -162,7 +160,7 @@ class Record {
   has (fieldName) {
     return this._config().keys.has(fieldName) && fieldName
   }
-/**
+  /**
  * get value or few values or whole record data
  * @param {any} args if args is empty will return whole record as object {field1: value1, field2: value2}
  * @returns {any} value or array of values or whole record as object
@@ -181,7 +179,7 @@ class Record {
       return this._data()
     }
   }
-/**
+  /**
  * @param {any} args if args is empty return whole record otherwise return object with only fields in args
  * @returns {Object} return always record data as object
  * @memberof Record
@@ -204,7 +202,7 @@ class Record {
     }
     return obj
   }
-/**
+  /**
  * @private
  * @returns {Model} instance of Model
  * @memberof Record
@@ -217,7 +215,7 @@ class Record {
     this._config().modified.forEach((i, key) => { data[key] = this._config().modified.get(key) })
     return data
   }
-/**
+  /**
  * @private
  * @returns {Model} instance of Model
  * @memberof Record
@@ -225,21 +223,21 @@ class Record {
   _getModel () {
     return new this.Model(this.owner.table, this.owner.modelConfig, this.owner.dbname)
   }
-/**
+  /**
  * @returns {Promise} Model instance
  * @memberof Record
  */
   find () {
     return this._getModel().find().where(`${this.owner.table}.id = ?`, this.get('id'))
   }
-/**
+  /**
  * @returns {Promise} Model instance
  * @memberof Record
  */
   update () {
     return this._getModel().update().where(`${this.owner.table}.id = ?`, this.get('id'))
   }
-/**
+  /**
  * @returns {Promise} Model instance
  * @memberof Record
  */
@@ -255,7 +253,7 @@ class Record {
       return me
     }
   }
-/**
+  /**
  * @returns {Promise} Model instance
  * @memberof Record
  */

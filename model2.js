@@ -108,7 +108,8 @@ class Model {
     }
 
     this.squel.registerValueHandler(Date, function (date) {
-      return date.getFullYear() + '-' + date.getMonth() + '-' + date.getDate() + ' ' + date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds()
+      return date
+      // return date.getFullYear() + '-' + date.getMonth() + '-' + date.getDate() + ' ' + date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds()
     })
     this.query = ''
 

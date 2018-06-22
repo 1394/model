@@ -392,7 +392,7 @@ class Model {
     paramsTotal.bypassEvents = true
     let paramsQuery = this.query.limit(this.paginate.limit).offset(this.paginate.offset).toParam()
     let data
-    data = await this._doRequest(paramsTotal)
+    data = await this._doRequest({text: `SELECT COUNT(*) as count FROM (${paramsTotal.text}) sq`, values: []})
     result.count = data[0].count
     result.pages = Math.ceil(result.count / this.paginate.limit)
     data = await this._doRequest(paramsQuery).catch(ex => { console.error(ex); throw ex })

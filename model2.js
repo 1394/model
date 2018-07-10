@@ -389,14 +389,15 @@ class Model {
       throw new Error('cant do paginate while paging is not configured, try call .page(number) or .doPage({page: number})!')
     }
     let result = { paginate: true }
-    let queryClone = this.query.clone()
+    let queryClone = this.query.clone().field(`COUNT(${this.table}.id) as count`)
     let paramsTotal = queryClone.field(`COUNT(${this.table}.id) as count`).toParam()
     if (opts.debug) {
-      console.log('\n', 'query for count total')
-      cconsole.log(opts.debug, this.queryClone.toString())
+      console.log('\n do local debug message:')
+      console.log('query for count total')
+      cconsole.log(opts.debug, queryClone.toString())
       console.log('\n', 'query with limit, offset')
       cconsole.log(opts.debug, this.query.toString())
-      console.log('\n')
+      cconsole.log('reset', '\n')
     }
     paramsTotal.bypassEvents = true
     let paramsQuery = this.query.limit(this.paginate.limit).offset(this.paginate.offset).toParam()
@@ -435,9 +436,9 @@ class Model {
     }
 
     if (opts.debug) {
-      console.log('\n')
+      console.log('\n do local debug message:')
       cconsole.log(opts.debug, this.query.toString())
-      console.log('\n')
+      cconsole.log('reset', '\n')
     }
 
     let params = this.query.toParam()

@@ -14,6 +14,8 @@ class ModelEmitter extends EventEmitter {
 const util = require('util')
 const squel = require('squel')
 const crypto = require('crypto')
+const cconsole = require('./cconsole')
+
 const Record = require('./record')
 const internals = {
   withOptions: {},
@@ -109,7 +111,6 @@ class Model {
 
     this.squel.registerValueHandler(Date, function (date) {
       return date
-      // return date.getFullYear() + '-' + date.getMonth() + '-' + date.getDate() + ' ' + date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds()
     })
     this.query = ''
 
@@ -425,6 +426,11 @@ class Model {
       return this.doPage()
     }
     let params = this.query.toParam()
+    if (opts.debug) {
+      console.log('\n')
+      cconsole.log(opts.debug, this.query.toString())
+      console.log('\n')
+    }
     data = await this._doRequest(params)
     let opMode = this.opMode
     me._resetModel()

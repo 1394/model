@@ -420,17 +420,18 @@ class Model {
     opts = opts || {}
     opts.fields = opts.fields || this.modelConfig.fields
 
+    if (opts.debug) {
+      console.log('\n')
+      cconsole.log(opts.debug, this.query.toString())
+      console.log('\n')
+    }
+
     var data
     this._addOpMode('do', opts)
     if (this.paginate) {
       return this.doPage()
     }
     let params = this.query.toParam()
-    if (opts.debug) {
-      console.log('\n')
-      cconsole.log(opts.debug, this.query.toString())
-      console.log('\n')
-    }
     data = await this._doRequest(params)
     let opMode = this.opMode
     me._resetModel()

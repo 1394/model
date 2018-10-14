@@ -1,6 +1,6 @@
 {
   "name": "@dmitri.leto/model",
-  "version": "1.0.83-dev",
+  "version": "1.0.84-dev",
   "description": "simple Model for the easy creation mysql queries",
   "main": "model.js",
   "scripts": {
@@ -22,8 +22,8 @@
     "co": "^4.6.0",
     "dateformat": "^1.0.12",
     "glob": "^7.1.1",
-    "mysql": "^2.13.0",
-    "mysql2": "^1.2.0",
+    "mysql": "^2.16.0",
+    "mysql2": "^1.6.1",
     "pluralize": "^3.0.0",
     "squel": "^5.5.0"
   }

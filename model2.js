@@ -359,10 +359,9 @@ class Model {
   async _doRequest (params) {
     this.consoleDebug(this.getOpMode())
     this.incrTable(JSON.stringify(params))
-    // if (this.getOpMode() === 'update') {
-    //   return this._doRequestUpdate(params)
-    // }
-    let data = await this.base.do({sql: params.text, values: params.values}).catch(ex => {
+
+    params.sql = params.sql || params.text
+    let data = await this.base.do(params).catch(ex => {
       console.error('error _doRequest : %s\n', JSON.stringify(params), JSON.stringify(ex))
       throw ex
     })
@@ -389,23 +388,24 @@ class Model {
       throw new Error('cant do paginate while paging is not configured, try call .page(number) or .doPage({page: number})!')
     }
     let result = { paginate: true }
-    let queryClone = this.query.clone()//.field(`COUNT(${this.table}.id) as count`)
-    let paramsTotal = queryClone.toParam()
-    if (opts.debug) {
-      console.log('\n do local debug message:')
-      console.log('query for count total')
-      cconsole.log(opts.debug, queryClone.toString())
-      console.log('\n', 'query with limit, offset')
-      cconsole.log(opts.debug, this.query.toString())
-      cconsole.log('reset', '\n')
-    }
-    paramsTotal.bypassEvents = true
+    // let queryClone = this.query.clone()//.field(`COUNT(${this.table}.id) as count`)
+    // let paramsTotal = queryClone.toParam()
+    // if (opts.debug) {
+    //   console.log('\n do local debug message:')
+    //   console.log('query for count total')
+    //   cconsole.log(opts.debug, queryClone.toString())
+    //   console.log('\n', 'query with limit, offset')
+    //   cconsole.log(opts.debug, this.query.toString())
+    //   cconsole.log('reset', '\n')
+    // }
+    // paramsTotal.bypassEvents = true
     let paramsQuery = this.query.limit(this.paginate.limit).offset(this.paginate.offset).toParam()
-    let data
-    data = await this._doRequest({ text: `SELECT COUNT(*) as count FROM (${paramsTotal.text}) sq`, values: paramsTotal.values })
-    result.count = data[0].count
+    paramsQuery.foundRows = true
+    // let data
+    // data = await this._doRequest({ text: `SELECT COUNT(*) as count FROM (${paramsTotal.text}) sq`, values: paramsTotal.values })
+    let {rows: data, count} = await this._doRequest(paramsQuery).catch(ex => { console.error(ex); throw ex })
+    result.count = count
     result.pages = Math.ceil(result.count / this.paginate.limit)
-    data = await this._doRequest(paramsQuery).catch(ex => { console.error(ex); throw ex })
     let opMode = this.opMode
     this._resetModel()
     if (opMode === 'find') {

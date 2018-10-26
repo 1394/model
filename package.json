@@ -1,7 +1,11 @@
 {
   "name": "@dmitri.leto/model",
-  "version": "1.0.89-pre",
+  "version": "1.0.89-dev",
   "description": "simple Model for the easy creation mysql queries",
+  "keywords": [
+    "mysql",
+    "wrapper"
+  ],
   "main": "model.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

@@ -1,0 +1,1 @@
+light wrapper for make requests to Mysql. based on squel & (mysql || mysql2)

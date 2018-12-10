@@ -674,6 +674,17 @@ class Model {
     if (this.getOpMode() === 'afterReset') {
       this.find()
     }
+    if (args.lenght === 1) {
+      let t = args[0].split(' ')
+      if (t.length === 2) {
+        args = t
+      }
+    }
+    if (args[1]) {
+      if (['asc', 'desc', 'ASC', 'DESC'].includes(args[1])) {
+        args[1] = !(args[1] === 'desc' || args[1] === 'DESC')
+      }
+    }
     this._addOpMode.apply(this, [].concat('order', args))
     return this.runCatch(function () {
       this.query = this.query.order.apply(this, args)

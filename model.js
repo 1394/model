@@ -674,7 +674,7 @@ class Model {
     if (this.getOpMode() === 'afterReset') {
       this.find()
     }
-    if (args.lenght === 1) {
+    if (args.length === 1) {
       let t = args[0].split(' ')
       if (t.length === 2) {
         args = t

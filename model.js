@@ -730,6 +730,17 @@ class Model {
     return this
   }
 
+  debugLog (fn) {
+    if (!fn) {
+      fn = log => console.log('\nsql = ', log, '\n')
+    }
+    let sql = this.query.toString()
+    if (typeof fn === 'function') {
+      fn.call(this, sql)
+    }
+    return this
+  }
+
   /**
 ## [starter method] - this method must be first at chain because is initialized inner 'squel' var
 @method Model.upsert

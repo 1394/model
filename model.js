@@ -38,7 +38,7 @@ const whereConvert = function (args, model) {
     let opts = ['']
     opts[0] = Object.keys(args).map(el => {
       opts.push(args[el])
-      if (!el.contains('.')) {
+      if (!el.includes('.')) {
         el = `${model.table}.${el}`
       }
       return `${el} = ?`

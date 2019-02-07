@@ -32,11 +32,17 @@ const internals = {
   events: new Map()
 }
 
-const whereConvert = function (args) {
+const whereConvert = function (args, model) {
   if (args && args.length === 1 && typeof args[0] === 'object' && Object.keys(args[0]).length) {
     args = args[0]
     let opts = ['']
-    opts[0] = Object.keys(args).map(el => { opts.push(args[el]); return `${el} = ?` }).join(' AND ')
+    opts[0] = Object.keys(args).map(el => {
+      opts.push(args[el])
+      if (!el.contains('.')) {
+        el = `${model.table}.${el}`
+      }
+      return `${el} = ?`
+    }).join(' AND ')
     return opts
   } else {
     return args
@@ -456,7 +462,7 @@ class Model {
     return this.first()
   }
 
-  first (...whereArgs) {
+  one (...whereArgs) {
     if (this.getOpMode() === 'afterReset') {
       this.find()
     }
@@ -465,6 +471,16 @@ class Model {
     }
     return this.limit(1).do({ first: true })
   }
+
+  // first (...whereArgs) {
+  //   if (this.getOpMode() === 'afterReset') {
+  //     this.find()
+  //   }
+  //   if (whereArgs.length) {
+  //     this.where(...whereArgs)
+  //   }
+  //   return this.limit(1).do({ first: true })
+  // }
 
   count (field = 'id') {
     this._setOpMode('count', field)
@@ -713,7 +729,7 @@ class Model {
       this.find()
     }
     this._addOpMode.apply(this, [].concat('where', args))
-    args = whereConvert(args)
+    args = whereConvert(args, this)
     this.actionData.push({ where: args })
     return this.runCatch(function () {
       this.query = this.query.where.apply(this, args)
@@ -830,5 +846,7 @@ class Model {
     return this
   }
 }
+
+Model.first = Model.one
 
 module.exports = Model

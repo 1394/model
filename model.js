@@ -472,6 +472,10 @@ class Model {
     return this.limit(1).do({ first: true })
   }
 
+  first (...whereArgs) {
+    this.one(...whereArgs)
+  }
+
   // first (...whereArgs) {
   //   if (this.getOpMode() === 'afterReset') {
   //     this.find()
@@ -846,7 +850,5 @@ class Model {
     return this
   }
 }
-
-Model.first = Model.one
 
 module.exports = Model

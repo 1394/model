@@ -36,18 +36,17 @@ const whereConvert = function (args, model) {
   if (args && args.length === 1 && typeof args[0] === 'object' && Object.keys(args[0]).length) {
     args = args[0]
     let opts = []
-    opts[0] = Object.keys(args).map(el => {
-      if (el !== '_sql') {
-        opts.push(args[el])
-        if (!el.includes('.')) {
-          el = `${model.table}.${el}`
-        }
-        return `${el} = ?`
+    let s = Object.keys(args).filter(el => el !== '_sql').map(el => {
+      opts.push(args[el])
+      if (!el.includes('.')) {
+        el = `${model.table}.${el}`
       }
-    }).join(' AND ')
+      return `${el} = ?`
+    })
     if (Array.isArray(args._sql) && args._sql[0]) {
-      opts = opts.concat(args._sql)
+      s = s.concat(args._sql)
     }
+    opts.unshift(s.join(' AND '))
     return opts
   } else {
     return args

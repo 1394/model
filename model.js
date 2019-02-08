@@ -35,7 +35,7 @@ const internals = {
 const whereConvert = function (args, model) {
   if (args && args.length === 1 && typeof args[0] === 'object' && Object.keys(args[0]).length) {
     args = args[0]
-    let opts = Array.isArray(args._sql) && args._sql[0] ? args._sql : ['']
+    let opts = []
     opts[0] = Object.keys(args).map(el => {
       opts.push(args[el])
       if (!el.includes('.')) {
@@ -43,6 +43,9 @@ const whereConvert = function (args, model) {
       }
       return `${el} = ?`
     }).join(' AND ')
+    if (Array.isArray(args._sql) && args._sql[0]) {
+      opts = opts.concat(args._sql)
+    }
     return opts
   } else {
     return args

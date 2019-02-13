@@ -351,6 +351,14 @@ class Model {
     return data
   }
 
+  raw () {
+    this._raw = true
+  }
+
+  _needWrap () {
+    return this._processFn && !opts.raw && !this._raw
+  }
+
   async _doRequest (params) {
     this.consoleDebug(this.getOpMode())
 
@@ -403,7 +411,7 @@ class Model {
     let opMode = this.opMode
     this._resetModel()
     if (opMode === 'find') {
-      if (this._processFn && !opts.raw) {
+      if (this._needWrap()) {
         data = this.runCatch(function () {
           return this._processFn(data)
         }, opts)
@@ -443,7 +451,7 @@ class Model {
       return data[0].count
     }
     if (opMode === 'find') {
-      if (this._processFn && !opts.raw) {
+      if (this._needWrap()) {
         data = this.runCatch(function () {
           return me._processFn(data)
         }, opts)

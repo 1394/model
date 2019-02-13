@@ -353,10 +353,12 @@ class Model {
 
   raw () {
     this._raw = true
+    return this
   }
 
   _needWrap () {
     return this._processFn && !opts.raw && !this._raw
+    return this
   }
 
   async _doRequest (params) {

@@ -487,7 +487,7 @@ class Model {
   }
 
   first (...whereArgs) {
-    this.one(...whereArgs)
+    return this.one(...whereArgs)
   }
 
   // first (...whereArgs) {

@@ -86,20 +86,17 @@ class Record {
  * @param {Object} options.assoc associations data
  * @memberof Record
  */
-  constructor (rowData, options) {
+  constructor (rowData, options = {}) {
     rowData = rowData || {}
-    let newRecord = true
-    if (options.processed) {
-      newRecord = false
-    }
-    // this.Model = Model
-    let config = {
+    const newRecord = !options.processed
+    const config = {
       fields: options.fields || [],
       row: rowData,
       table: options.table,
       modified: new Map(),
       keys: new Set(Object.keys(rowData))
     }
+    this._suppressNotExisted = options.suppressNotExisted
     this.owner = options.owner
     this.Model = options.model
     this.attr = {}
@@ -172,9 +169,14 @@ class Record {
  *    rec.get('id', 'name') // return [12, 'ivan']
  */
   get (...args) {
-    let length = args.length
-    if (length) {
-      return length === 1 ? this._data()[args[0]] : args.map(el => this._data()[el])
+    if (args.length) {
+      if (!this._suppressNotExisted) {
+        const notExistedField = args.find(arg => !this._config().keys.has(arg))
+        if (notExistedField) {
+          throw new Error(` [Error:get] field[${notExistedField}] does not exist, detected while trying to access table[${this._config().table}] entry!`)
+        }
+      }
+      return args.length === 1 ? this._data()[args[0]] : args.map(el => this._data()[el])
     } else {
       return this._data()
     }

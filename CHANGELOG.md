@@ -1,4 +1,6 @@
 # @dmitri.leto/model changelog
+## 1.1.51
+* fix error message in Record.js
 ## 1.1.50
 * Added check for the presence of a field in the record when trying to access via the .get method
 ## 1.1.49

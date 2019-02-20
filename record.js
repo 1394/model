@@ -92,7 +92,7 @@ class Record {
     const config = {
       fields: options.fields || [],
       row: rowData,
-      table: options.table,
+      table: options.owner && options.owner.table,
       modified: new Map(),
       keys: new Set(Object.keys(rowData))
     }

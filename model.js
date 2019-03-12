@@ -132,7 +132,7 @@ class Model {
     } else {
       cfg.debug && console.log(this.table, ' used data cb callback, cfg: ', cfg)
       this.setProcessDataCallback(function (rows) {
-        return Array.isArray(rows) ? rows.map(row => new Record(row, {processed: true, assoc: me.assocs.get(this.table), owner: me, model: Model})) : new Record(rows, {processed: true, assoc: me.assocs.get(this.table), owner: me, model: Model})
+        return Array.isArray(rows) ? rows.map(row => new Record(row, {strict: cfg.strict, processed: true, assoc: me.assocs.get(this.table), owner: me, model: Model})) : new Record(rows, {strict: cfg.strict, processed: true, assoc: me.assocs.get(this.table), owner: me, model: Model})
       })
     }
 
@@ -861,6 +861,13 @@ class Model {
       arg = arg || []
       arg.unshift(this)
       return fn.apply(this, arg)
+    }
+    return this
+  }
+
+  if (pred, fn) {
+    if (pred) {
+      return fn(this)
     }
     return this
   }

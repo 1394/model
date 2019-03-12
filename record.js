@@ -90,6 +90,7 @@ class Record {
     rowData = rowData || {}
     const newRecord = !options.processed
     const config = {
+      strict: options.strict,
       fields: options.fields || [],
       row: rowData,
       table: options.owner && options.owner.table,
@@ -99,19 +100,38 @@ class Record {
     this._suppressNotExisted = options.suppressNotExisted
     this.owner = options.owner
     this.Model = options.model
-    this.attr = {}
+    this.attr = Object.assign({}, rowData)
 
     this._config = () => config
     this.isNew = () => newRecord
-    this._data = () => config.row
+    this._data = () => rowData
 
-    for (let k of config.keys) {
-      this.attr[k] = this.get(k)
-    }
     if (options.assoc) {
       buildAssoc(this, options.assoc)
     }
-    return this
+    return !config.strict ? this : new Proxy(this, {
+      get (rec, field) {
+        if (field === 'H' || field === '_H') {
+          return {
+            get: rec.get.bind(rec),
+            set: rec.set.bind(rec)
+          }
+        }
+        if (rec._config().keys.has(field)) {
+          return rec.attr[field]
+        } else {
+          console.error(' [Model:Record:get:error] model:%s, field "%s" not existed', config.table, field)
+        }
+      },
+      set (rec, field, val) {
+        if (rec._config().keys.has(field)) {
+          rec.attr[field] = val
+          return true
+        } else {
+          console.error(' [Model:Record:set:error] model:%s, field "%s" not existed', config.table, field)
+        }
+      }
+    })
   }
   /**
  * @param {any} key string or object, when object can be {name: 'name', ref_id: 3604}, for example item.set({name: 'name', ref_id: 3604}) will set name to 'name' and ref_id to 3604

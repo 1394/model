@@ -109,6 +109,9 @@ class Record {
     if (options.assoc) {
       buildAssoc(this, options.assoc)
     }
+
+    this.toJSON = () => this._data()
+
     return !config.strict ? this : new Proxy(this, {
       get (rec, field) {
         if (field === 'H' || field === '_H') {

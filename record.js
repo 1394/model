@@ -112,10 +112,7 @@ class Record {
     return !config.strict ? this : new Proxy(this, {
       get (rec, field) {
         if (field === 'H' || field === '_H') {
-          return {
-            get: rec.get.bind(rec),
-            set: rec.set.bind(rec)
-          }
+          return rec
         }
         if (rec._config().keys.has(field)) {
           return rec.attr[field]

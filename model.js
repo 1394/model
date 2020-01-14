@@ -225,7 +225,7 @@ class Model {
       args = args[0];
     }
     const el = {};
-    el[mode] = args;
+    el[mode] = args || null;
     this.logs.push(el);
     this.operations[mode] = this.operations[mode] || [];
     if (args) {

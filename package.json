@@ -1,7 +1,7 @@
 {
   "name": "@dmitri.leto/model",
-  "version": "1.1.63",
-  "description": "simple Model for the easy creation mysql queries",
+  "version": "1.1.64",
+  "description": "simple model to create mysql queries easily",
   "keywords": [
     "mysql",
     "wrapper"
@@ -12,7 +12,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://leto1394@bitbucket.org/leto1394/model.git"
+    "url": "https://github.com/1394/model.git"
   },
   "author": "dmitri.leto",
   "licenses": [
@@ -21,14 +21,12 @@
       "url": "https://github.com/brentertz/scapegoat/blob/master/LICENSE-MIT"
     }
   ],
-  "homepage": "https://bitbucket.org/leto1394/model#Readme.md",
+  "homepage": "https://github.com/1394/model.git",
   "dependencies": {
-    "co": "^4.6.0",
     "dateformat": "^1.0.12",
-    "glob": "^7.1.1",
-    "mysql": "^2.16.0",
-    "mysql2": "^1.6.1",
-    "pluralize": "^3.0.0",
-    "squel": "^5.5.0"
+    "mysql": "^2.18.1",
+    "mysql2": "^2.2.5",
+    "pluralize": "^8.0.0",
+    "squel": "^5.13.0"
   }
 }

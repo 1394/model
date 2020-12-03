@@ -91,15 +91,15 @@ class Model {
     this._setupGlobalListeners();// must be set table before call!!!
     this.dbConfig = internals.db_config[this.dbname];
     this.squel = squel;
-    this.squel.registerValueHandler(Date, (d) => {
-      return d;
-    });
+    // this.squel.registerValueHandler(Date, (d) => {
+    //   return d;
+    // });
     this.df = require('dateformat');
     this.df.i18n = internals.i18n;
     this.strftime = function(v, format) {
       return this.df(v, format || 'dd-mmmm-yyyy HH:MM');
     };
-    this.squel.useFlavour('mysql');
+    // this.squel.useFlavour('mysql');
 
     const DbService = require('./lib/dbservice');
     this.base = new DbService(this.dbConfig, this.modelConfig.debug, {serviceConn: this.modelConfig.serviceConn});
@@ -124,9 +124,9 @@ class Model {
       }
     };
 
-    this.squel.registerValueHandler(Date, function(date) {
-      return date;
-    });
+    // this.squel.registerValueHandler(Date, function(date) {
+    //   return date;
+    // });
     this.query = '';
 
     const me = this;

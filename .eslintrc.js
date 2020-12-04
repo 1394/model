@@ -1,19 +1,33 @@
 module.exports = {
-  'env': {
-    'commonjs': true,
-    'es6': true,
-    'node': true,
+  env: {
+    browser: true,
+    node: true,
+    es6: true,
   },
-  'extends': [
-    'google',
-  ],
-  'globals': {
-    'Atomics': 'readonly',
-    'SharedArrayBuffer': 'readonly',
+  globals: {
+    Ext: 'readable',
+    Xpand: 'readable',
+    Fabric: 'readable',
+    TurndownService: 'readable',
+    showdown: 'readable',
   },
-  'parserOptions': {
-    'ecmaVersion': 2018,
+  extends: 'google',
+  parserOptions: {
+    ecmaVersion: 2020,
   },
-  'rules': {
+  rules: {
+    'prefer-const': 'error',
+    'max-len': ['error', {code: 120}],
+    'semi': ['error', 'never'],
+    'comma-dangle': ['error', {
+      'arrays': 'always-multiline',
+      'objects': 'always-multiline',
+      'imports': 'always-multiline',
+      'exports': 'always-multiline',
+      'functions': 'never',
+    }],
+    'camelcase': 0,
+    'indent': ['error', 2],
+    'no-undef': ['error'],
   },
-};
+}

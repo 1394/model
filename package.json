@@ -1,7 +1,7 @@
 {
   "name": "@dmitri.leto/model",
-  "version": "1.1.64",
-  "description": "simple model to create mysql queries easily",
+  "version": "1.2.01",
+  "description": "simple Model for the easy creation mysql queries",
   "keywords": [
     "mysql",
     "wrapper"
@@ -24,9 +24,14 @@
   "homepage": "https://github.com/1394/model.git",
   "dependencies": {
     "dateformat": "^1.0.12",
-    "mysql": "^2.18.1",
-    "mysql2": "^2.2.5",
-    "pluralize": "^8.0.0",
-    "squel": "^5.13.0"
+    "glob": "^7.1.1",
+    "mysql": "^2.16.0",
+    "mysql2": "^1.6.1",
+    "pluralize": "^3.0.0",
+    "squel": "^5.5.0"
+  },
+  "devDependencies": {
+    "eslint": "^7.14.0",
+    "eslint-config-google": "^0.14.0"
   }
 }

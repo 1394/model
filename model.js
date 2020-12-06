@@ -1,3 +1,4 @@
+/* eslint-disable valid-jsdoc */
 /* eslint-disable max-len */
 /* eslint-disable require-jsdoc */
 'use strict'
@@ -108,8 +109,8 @@ class Model {
 
     this._resetModel()
 
-    this.showLog = function(e, args) {
-      args ? this.logs.push(util.inspect(args), e) : this.showLog(e, arguments)
+    this.showLog = function(e, ...args) {
+      args.length ? this.logs.push(util.inspect(args), e) : this.showLog(e)
       console.log('\r\nError : ********************************************************')
       console.log(`model ${this.dbname}.${this.table} error `, this.logs.join(':'))
       console.log('****************************************************************\r\n')
@@ -137,7 +138,7 @@ class Model {
     } else {
       cfg.debug && console.log(this.table, ' used data cb callback, cfg: ', cfg)
       this.setProcessDataCallback(function(rows) {
-        return Array.isArray(rows) ? rows.map((row) => new Record(row, {strict: cfg.strict, processed: true, assoc: me.assocs.get(this.table), owner: me, model: Model})) : new Record(rows, {strict: cfg.strict, processed: true, assoc: me.assocs.get(this.table), owner: me, model: Model})
+        return Array.isArray(rows) ? rows.map((row) => new Record(row, {strict: cfg.strict, processed: true, assoc: me.assocs.get(me.table), owner: me, model: Model})) : new Record(rows, {strict: cfg.strict, processed: true, assoc: me.assocs.get(me.table), owner: me, model: Model})
       })
     }
 
@@ -203,7 +204,7 @@ class Model {
     this._resetModel()
     this.opMode = mode
     args.unshift(mode)
-    this._addOpMode.apply(this, args)
+    this._addOpMode(...args)
   }
   /**
  * @return {String} model start mode
@@ -442,8 +443,9 @@ class Model {
     this._resetModel()
     if (opMode === 'find') {
       if (this._needWrap(opts)) {
+        const me = this
         data = this.runCatch(function() {
-          return this._processFn(data)
+          return me._processFn(data)
         }, opts)
       }
     }
@@ -529,68 +531,73 @@ class Model {
   // }
 
   count(field = 'id') {
+    const me = this
     this._setOpMode('count', field)
     return this.runCatch(function() {
       if (field.includes('.')) {
         field = `COUNT(${field}) as count`
       } else {
-        field = `COUNT(${this.table}.${field}) as count`
+        field = `COUNT(${me.table}.${field}) as count`
       }
-      this.query = this.Q.select().from(this.table).field(field)
-      return this
+      me.query = me.Q.select().from(me.table).field(field)
+      return me
     }, field)
   }
 
   find(table, fields) {
+    const me = this
     this._setOpMode('find', table, fields)
     fields = fields || '*'
     return this.runCatch(function() {
       if (typeof table === 'object' && table.fields && table.fields.length) {
         if (Array.isArray(table.fields)) {
-          table.fields = table.fields.map((f) => this.table + '.' + f).join(',')
+          table.fields = table.fields.map((f) => me.table + '.' + f).join(',')
         }
-        this.query = this.Q.select().from(this.table).field(table.fields)
-        return this
+        me.query = me.Q.select().from(me.table).field(table.fields)
+        return me
       } else {
-        this.query = table ? this.query.from(table).field(table + '.' + fields) : this.Q.select().from(this.table).field(this.table + '.' + fields)
-        return this
+        me.query = table ? me.query.from(table).field(table + '.' + fields) : me.Q.select().from(me.table).field(me.table + '.' + fields)
+        return me
       }
     }, table, fields)
   }
 
   update(data) {
+    const me = this
     this._setOpMode('update', data)
     return this.runCatch(function() {
-      this.query = this.Q.update().table(this.table)
+      me.query = me.Q.update().table(me.table)
       if (data && typeof data === 'object' && Object.keys(data).length) {
-        this.setFields(data)
+        me.setFields(data)
       }
-      this.action = 'update'
-      this.actionData = data ? [data] : []
-      return this
+      me.action = 'update'
+      me.actionData = data ? [data] : []
+      return me
     }, data)
   }
 
   insert(data) {
+    const me = this
     this._setOpMode('insert', data)
     return this.runCatch(function() {
-      this.query = this.Q.insert().into(this.table)
+      me.query = me.Q.insert().into(me.table)
       if (data && typeof data === 'object' && Object.keys(data).length) {
-        this.setFields(data)
+        me.setFields(data)
       }
-      this.action = 'insert'
-      this.actionData = data ? [data] : []
-      return this
+      me.action = 'insert'
+      me.actionData = data ? [data] : []
+      return me
     }, data)
   }
 
   delete() {
+    const me = this
     this._setOpMode('delete')
     return this.runCatch(function() {
-      this.query = this.Q.delete().from(this.table)
-      this.action = 'delete'
-      this.actionData = []
-      return this
+      me.query = me.Q.delete().from(me.table)
+      me.action = 'delete'
+      me.actionData = []
+      return me
     })
   }
 
@@ -617,38 +624,41 @@ class Model {
   }
 
   join(table, where, alias) {
+    const me = this
     if (this.getOpMode() === 'afterReset') {
       this.find()
     }
     this._addOpMode('join', table, where, alias)
     return this.runCatch(function() {
-      this.query = this.query.join(table, alias, where)
-      this.actionData.push({join: [table, where, alias]})
-      return this
+      me.query = me.query.join(table, alias, where)
+      me.actionData.push({join: [table, where, alias]})
+      return me
     }, table, where, alias)
   }
 
   outerJoin(table, where, alias) {
+    const me = this
     if (this.getOpMode() === 'afterReset') {
       this.find()
     }
     this._addOpMode('outer_join', table, where, alias)
     return this.runCatch(function() {
-      this.query = this.query.join(table, alias, where, 'OUTER')
-      this.actionData.push({outer_join: [table, where, alias]})
-      return this
+      me.query = me.query.join(table, alias, where, 'OUTER')
+      me.actionData.push({outer_join: [table, where, alias]})
+      return me
     }, table, where, alias)
   }
 
   leftOuterJoin(table, where, alias) {
+    const me = this
     if (this.getOpMode() === 'afterReset') {
       this.find()
     }
     this._addOpMode('left_outer_join', table, where, alias)
     return this.runCatch(function() {
-      this.query = this.query.join(table, alias, where, 'LEFT OUTER')
-      this.actionData.push({left_outer_join: [table, where, alias]})
-      return this
+      me.query = me.query.join(table, alias, where, 'LEFT OUTER')
+      me.actionData.push({left_outer_join: [table, where, alias]})
+      return me
     }, table, where, alias)
   }
 
@@ -672,10 +682,11 @@ class Model {
   }
 
   field(...args) {
-    this._addOpMode.apply(this, [].concat('field', args))
+    const me = this
+    this._addOpMode(this, ...[].concat('field', args))
     return this.runCatch(function() {
-      this.query = this.query.field.apply(this, args)
-      return this
+      me.query = me.query.field.apply(me, args)
+      return me
     }, args)
   }
 
@@ -684,23 +695,24 @@ class Model {
     try {
       this.query = this.query.fields(opts)
     } catch (e) {
-      this.showLog(e, arguments)
+      this.showLog(e, opts)
     }
     return this
   }
 
   setFields(opts) {
+    const me = this
     this._addOpMode('setFields', opts)
     return this.runCatch(function() {
       if (typeof opts === 'string') {
-        this.query.set(opts)
-        return this
+        me.query.set(opts)
+        return me
       }
       Object.keys(opts || {}).forEach((k) => {
-        const escaped = '`' + this.table + '`.`' + k + '`'
-        this.query.set(escaped, opts[k])
+        const escaped = '`' + me.table + '`.`' + k + '`'
+        me.query.set(escaped, opts[k])
       })
-      return this
+      return me
     }, opts)
   }
 
@@ -709,18 +721,20 @@ class Model {
   }
 
   limit(opts) {
+    const me = this
     this._addOpMode('limit', opts)
     return this.runCatch(function() {
-      this.query = this.query.limit(opts)
-      return this
+      me.query = me.query.limit(opts)
+      return me
     }, opts)
   }
 
   offset(opts) {
+    const me = this
     this._addOpMode('offset', opts)
     return this.runCatch(function() {
-      this.query = this.query.offset(opts)
-      return this
+      me.query = me.query.offset(opts)
+      return me
     }, opts)
   }
 
@@ -739,18 +753,20 @@ class Model {
         args[1] = !(args[1] === 'desc' || args[1] === 'DESC')
       }
     }
-    this._addOpMode.apply(this, [].concat('order', args))
+    const me = this
+    this._addOpMode(...[].concat('order', args))
     return this.runCatch(function() {
-      this.query = this.query.order.apply(this, args)
-      return this
+      me.query = me.query.order.apply(me, args)
+      return me
     }, args)
   }
 
   group(by) {
+    const me = this
     this._addOpMode('group', by)
     return this.runCatch(function() {
-      this.query = this.query.group(by)
-      return this
+      me.query = me.query.group(by)
+      return me
     }, by)
   }
 

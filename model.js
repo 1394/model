@@ -118,9 +118,9 @@ class Model {
 
     this.runCatch = function(func, ...args) {
       try {
-        return func.call(this)
+        return func.bind(this)()
       } catch (ex) {
-        this.showLog(ex, args)
+        this.showLog(ex, ex.stack, args)
         throw ex
       }
     }
@@ -683,11 +683,11 @@ class Model {
 
   field(...args) {
     const me = this
-    this._addOpMode(this, ...[].concat('field', args))
-    return this.runCatch(function() {
-      me.query = me.query.field.apply(me, args)
-      return me
-    }, args)
+    // this._addOpMode(this, ...[].concat('field', args))
+    // return this.runCatch(function() {
+    me.query = me.query.field(...args)
+    return me
+    // }, args)
   }
 
   fields(opts) {
@@ -723,19 +723,19 @@ class Model {
   limit(opts) {
     const me = this
     this._addOpMode('limit', opts)
-    return this.runCatch(function() {
-      me.query = me.query.limit(opts)
-      return me
-    }, opts)
+    // return this.runCatch(function() {
+    me.query = me.query.limit(opts)
+    return me
+    // }, opts)
   }
 
   offset(opts) {
     const me = this
     this._addOpMode('offset', opts)
-    return this.runCatch(function() {
-      me.query = me.query.offset(opts)
-      return me
-    }, opts)
+    // return this.runCatch(function() {
+    me.query = me.query.offset(opts)
+    return me
+    // }, opts)
   }
 
   order(...args) {
@@ -755,19 +755,19 @@ class Model {
     }
     const me = this
     this._addOpMode(...[].concat('order', args))
-    return this.runCatch(function() {
-      me.query = me.query.order.apply(me, args)
-      return me
-    }, args)
+    // return this.runCatch(function() {
+    me.query = me.query.order(...args)
+    return me
+    // }, args)
   }
 
   group(by) {
     const me = this
     this._addOpMode('group', by)
-    return this.runCatch(function() {
-      me.query = me.query.group(by)
-      return me
-    }, by)
+    // return this.runCatch(function() {
+    me.query = me.query.group(by)
+    return me
+    // }, by)
   }
 
   having(...args) {

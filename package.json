@@ -28,7 +28,7 @@
     "mysql2": "^1.6.1",
     "pluralize": "^3.0.0"
   },
-  "1devDependencies": {
+  "devDependencies": {
     "eslint": "^7.14.0",
     "eslint-config-google": "^0.14.0"
   }

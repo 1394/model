@@ -17,7 +17,7 @@ class ModelEmitter extends EventEmitter {
 const util = require('util')
 const Query = require('./lib/query')
 const crypto = require('crypto')
-const cconsole = require('./cconsole')
+// const cconsole = require('./cconsole')
 
 const Record = require('./record')
 const internals = {

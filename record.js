@@ -1,48 +1,49 @@
+/* eslint-disable max-len */
 'use strict'
 
 const prepareArgs = (args) => {
   return {
     table: args[0],
     foreignKey: args[1],
-    primaryKey: args[2] || args[1].split('_').pop()
+    primaryKey: args[2] || args[1].split('_').pop(),
   }
 }
 
-let capitalizeWord = function (string) {
+const capitalizeWord = function(string) {
   return string[0].toUpperCase() + string.slice(1)
 }
 
-let capitalize = (string) => {
+const capitalize = (string) => {
   return string.split('_').map(capitalizeWord).join('')
 }
 
 const buildAssoc = (record, assoc) => {
   if (assoc.belongsTo && assoc.belongsTo.length) {
-    for (let opts of assoc.belongsTo) {
+    for (const opts of assoc.belongsTo) {
       buildBelongsToAssoc(record, prepareArgs(opts))
     }
   }
   if (assoc.hasMany && assoc.hasMany.length) {
-    for (let opts of assoc.hasMany) {
+    for (const opts of assoc.hasMany) {
       buildHasManyAssoc(record, prepareArgs(opts))
     }
   }
 }
 
 const buildBelongsToAssoc = (record, opts) => {
-  record[`get${capitalize(opts.table)}`] = async function (cfg = {}) {
+  record[`get${capitalize(opts.table)}`] = async function(cfg = {}) {
     if (!record.Model) {
       return
     }
-    var data = await (new record.Model(opts.table, {debug: true}).find().where(`${opts.primaryKey} = ?`, record.get(opts.foreignKey)).doFirst())
+    const data = await (new record.Model(opts.table, {debug: true}).find().where(`${opts.primaryKey} = ?`, record.get(opts.foreignKey)).doFirst())
     return data && new Record(data._data(), {
       processed: true,
       assoc: record.owner && record.owner.assocs.get(opts.table),
       owner: record.owner,
-      model: record.Model
+      model: record.Model,
     })
   }
-  record[`find${capitalize(opts.table)}`] = function (cfg = {}) {
+  record[`find${capitalize(opts.table)}`] = function(cfg = {}) {
     if (!record.Model) {
       return Promise.resolve()
     }
@@ -51,19 +52,19 @@ const buildBelongsToAssoc = (record, opts) => {
 }
 
 const buildHasManyAssoc = (record, opts) => {
-  record[`get${capitalize(opts.table)}`] = async function (cfg = {}) {
+  record[`get${capitalize(opts.table)}`] = async function(cfg = {}) {
     if (!record.Model) {
       return
     }
-    var data = await (new record.Model(opts.table, {debug: true}).find().where(`${opts.foreignKey} = ?`, record.get(opts.primaryKey)).do())
-    return data.map(row => new Record(row._data(), {
+    const data = await (new record.Model(opts.table, {debug: true}).find().where(`${opts.foreignKey} = ?`, record.get(opts.primaryKey)).do())
+    return data.map((row) => new Record(row._data(), {
       processed: true,
       assoc: record.owner && record.owner.assocs.get(opts.table),
       owner: record.owner,
-      model: record.Model
+      model: record.Model,
     }))
   }
-  record[`find${capitalize(opts.table)}`] = function (cfg = {}) {
+  record[`find${capitalize(opts.table)}`] = function(cfg = {}) {
     if (!record.Model) {
       return Promise.resolve()
     }
@@ -86,7 +87,7 @@ class Record {
  * @param {Object} options.assoc associations data
  * @memberof Record
  */
-  constructor (rowData, options = {}) {
+  constructor(rowData, options = {}) {
     rowData = rowData || {}
     const newRecord = !options.processed
     const config = {
@@ -95,7 +96,7 @@ class Record {
       row: rowData,
       table: options.owner && options.owner.table,
       modified: new Map(),
-      keys: new Set(Object.keys(rowData))
+      keys: new Set(Object.keys(rowData)),
     }
     this._suppressNotExisted = options.suppressNotExisted
     this.owner = options.owner
@@ -113,7 +114,7 @@ class Record {
     this.toJSON = () => this._data()
 
     return !config.strict ? this : new Proxy(this, {
-      get (rec, field) {
+      get(rec, field) {
         if (field === 'H' || field === '_H') {
           return rec
         }
@@ -123,23 +124,23 @@ class Record {
           console.error(' [Model:Record:get:error] model:%s, field "%s" not existed', config.table, field)
         }
       },
-      set (rec, field, val) {
+      set(rec, field, val) {
         if (rec._config().keys.has(field)) {
           rec.attr[field] = val
           return true
         } else {
           console.error(' [Model:Record:set:error] model:%s, field "%s" not existed', config.table, field)
         }
-      }
+      },
     })
   }
   /**
  * @param {any} key string or object, when object can be {name: 'name', ref_id: 3604}, for example item.set({name: 'name', ref_id: 3604}) will set name to 'name' and ref_id to 3604
  * @param {any} value value of field
- * @returns Record instance
+ * @return Record instance
  * @memberof Record
  */
-  set (key, value) {
+  set(key, value) {
     if (typeof key === 'string') {
       if (!this.has(key)) {
         console.warn(`field : ${key} not found in model, ignore to set!`)
@@ -153,7 +154,7 @@ class Record {
       return this
     }
     if (typeof key === 'object' && Object.keys(key).length && !value) {
-      for (let k of Object.keys(key)) {
+      for (const k of Object.keys(key)) {
         this.set(k, key[k])
       }
       return this
@@ -163,10 +164,10 @@ class Record {
   }
 
   /**
- * @returns {Array} record fields
+ * @return {Array} record fields
  * @memberof Record
  */
-  keys () {
+  keys() {
     return [...this._config().keys]
   }
   /**
@@ -174,13 +175,13 @@ class Record {
  * @return {false|String} field if record has field, otherwise false
  * @memberof Record
  */
-  has (fieldName) {
+  has(fieldName) {
     return this._config().keys.has(fieldName) && fieldName
   }
   /**
  * get value or few values or whole record data
  * @param {any} args if args is empty will return whole record as object {field1: value1, field2: value2}
- * @returns {any} value or array of values or whole record as object
+ * @return {any} value or array of values or whole record as object
  * @memberof Record
  * @example
  *    record data {id: 12, name: 'ivan', guid: 'qwed3d123das', archived: false}
@@ -188,22 +189,22 @@ class Record {
  *    rec.get('id') // return 12
  *    rec.get('id', 'name') // return [12, 'ivan']
  */
-  get (...args) {
+  get(...args) {
     if (args.length) {
       if (!this._suppressNotExisted) {
-        const notExistedField = args.find(arg => !this._config().keys.has(arg))
+        const notExistedField = args.find((arg) => !this._config().keys.has(arg))
         if (notExistedField) {
           throw new Error(` [Error:get] field[${notExistedField}] does not exist, detected while trying to access table[${this._config().table}] entry!`)
         }
       }
-      return args.length === 1 ? this._data()[args[0]] : args.map(el => this._data()[el])
+      return args.length === 1 ? this._data()[args[0]] : args.map((el) => this._data()[el])
     } else {
       return this._data()
     }
   }
   /**
  * @param {any} args if args is empty return whole record otherwise return object with only fields in args
- * @returns {Object} return always record data as object
+ * @return {Object} return always record data as object
  * @memberof Record
  * @example
  *    record data {id: 12, name: 'ivan', guid: 'qwed3d123das', archived: false}
@@ -211,14 +212,14 @@ class Record {
  *    rec.get('id') // return {id: 12}
  *    rec.get('id', 'name') // return {id: 12, name: 'ivan'}
  */
-  getObj (...args) {
-    let obj = {}
+  getObj(...args) {
+    const obj = {}
     if (args.length) {
-      args.forEach(el => {
+      args.forEach((el) => {
         obj[el] = this._data()[el]
       })
     } else {
-      this.keys().forEach(el => {
+      this.keys().forEach((el) => {
         obj[el] = this._data()[el]
       })
     }
@@ -226,44 +227,46 @@ class Record {
   }
   /**
  * @private
- * @returns {Model} instance of Model
+ * @return {Model} instance of Model
  * @memberof Record
  */
-  modified () {
+  modified() {
     if (this._config().modified.size === 0) {
       return false
     }
-    let data = {}
-    this._config().modified.forEach((i, key) => { data[key] = this._config().modified.get(key) })
+    const data = {}
+    this._config().modified.forEach((i, key) => {
+      data[key] = this._config().modified.get(key)
+    })
     return data
   }
   /**
  * @private
- * @returns {Model} instance of Model
+ * @return {Model} instance of Model
  * @memberof Record
  */
-  _getModel () {
+  _getModel() {
     return new this.Model(this.owner.table, this.owner.modelConfig, this.owner.dbname)
   }
   /**
- * @returns {Promise} Model instance
+ * @return {Promise} Model instance
  * @memberof Record
  */
-  find () {
+  find() {
     return this._getModel().find().where(`${this.owner.table}.id = ?`, this.get('id'))
   }
   /**
- * @returns {Promise} Model instance
+ * @return {Promise} Model instance
  * @memberof Record
  */
-  update () {
+  update() {
     return this._getModel().update().where(`${this.owner.table}.id = ?`, this.get('id'))
   }
   /**
- * @returns {Promise} Model instance
+ * @return {Promise} Model instance
  * @memberof Record
  */
-  save () {
+  save() {
     const me = this
     if (this.modified()) {
       return this._getModel().update().where(`${this.owner.table}.id = ?`, this.get('id')).setFields(this.modified()).do()
@@ -276,10 +279,10 @@ class Record {
     }
   }
   /**
- * @returns {Promise} Model instance
+ * @return {Promise} Model instance
  * @memberof Record
  */
-  delete () {
+  delete() {
     return this._getModel().delete().where(`${this.owner.table}.id = ?`, this.get('id'))
   }
 }

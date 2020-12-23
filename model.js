@@ -443,12 +443,11 @@ class Model {
       const opMode = this.opMode
       this._resetModel()
       if (opMode === 'find') {
-        if (this._needWrap(opts)) {
-          result.rows = this._processFn(data)
-        }
+        result.rows = this._needWrap(opts) ? this._processFn(data) : data
       } else {
         result.rows = data
       }
+      console.log({result})
       return result
     } catch (ex) {
       console.log('[ERROR] model doPage'+'!'.repeat(50))

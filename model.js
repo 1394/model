@@ -434,7 +434,7 @@ class Model {
     try {
       const result = {paginate: true}
       const paramsQuery = this.query.limit(this.paginate.limit).offset(this.paginate.offset).toParam()
-      paramsQuery.foundRows = true
+      paramsQuery.foundRows = this.table
       const {rows: data, count} = await this._doRequest(paramsQuery).catch((ex) => {
         console.error(ex); throw ex
       })

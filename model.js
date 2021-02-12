@@ -362,19 +362,20 @@ class Model {
   }
 
   async _doRequestUpdate(params) {
+    const debug = this.debug
     const conn = await this.base.getConn()
     if (!conn) {
       console.error('error get db connection')
       throw new Error('error get db connection')
     }
-    await this.base.doConn(conn, 'BEGIN;').then((res) => console.log('BEGIN;', res))
+    await this.base.doConn(conn, 'BEGIN;').then((res) => debug && console.log('BEGIN;', res))
     const data = await this.base.doConn(conn, {sql: params.text, values: params.values}).catch((ex) => {
       console.error('error _doRequest : %s\n', JSON.stringify(params), JSON.stringify(ex))
-      this.base.doConn('ROLLBACK;').then((res) => console.log('ROLLBACK;', res))
+      this.base.doConn('ROLLBACK;').then((res) => debug && console.log('ROLLBACK;', res))
       conn.release()
       throw ex
     })
-    await this.base.doConn(conn, 'COMMIT;').then((res) => console.log('COMMIT;', res))
+    await this.base.doConn(conn, 'COMMIT;').then((res) => debug && console.log('COMMIT;', res))
     const handler = internals.eventHandlers.get(this.action)
     if (handler) {
       handler(this)

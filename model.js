@@ -399,7 +399,7 @@ class Model {
 
   async _doRequest(params) {
     // this.consoleDebug(this.getOpMode())
-    console.log('_doRequest params:', params)
+    this.debug && console.log('_doRequest params:', params)
     params.sql = params.sql || params.text
     const data = await this.base.do(params).catch((ex) => {
       console.error('error _doRequest : %s\n', JSON.stringify(params), JSON.stringify(ex))

@@ -1,4 +1,91 @@
-/* eslint-disable valid-jsdoc */
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title> model.js</title>
+
+  <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="./build/entry.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+  <link href="https://fonts.googleapis.com/css?family=Roboto:100,400,700|Inconsolata,700" rel="stylesheet">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+  <link type="text/css" rel="stylesheet" href="https://jmblog.github.io/color-themes-for-google-code-prettify/themes/tomorrow-night.min.css">
+  <link type="text/css" rel="stylesheet" href="styles/app.min.css">
+  <link type="text/css" rel="stylesheet" href="styles/iframe.css">
+  <link type="text/css" rel="stylesheet" href="">
+  <script async defer src="https://buttons.github.io/buttons.js"></script>
+
+  
+</head>
+
+
+
+<body class="layout small-header">
+    <div id="stickyNavbarOverlay"></div>
+    
+
+<div class="top-nav">
+    <div class="inner">
+        <a id="hamburger" role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+        </a>
+        <div class="logo">
+            
+            
+        </div>
+        <div class="menu">
+            
+            <div class="navigation">
+                <a
+                    href="index.html"
+                    class="link"
+                >
+                    API Documentation
+                </a>
+                
+                
+                
+            </div>
+        </div>
+    </div>
+</div>
+    <div id="main">
+        <div
+            class="sidebar "
+            id="sidebarNav"
+        >
+            
+            <nav>
+                
+                    <h2><a href="index.html">Documentation</a></h2><div class="category"><h3>Classes</h3><ul><li><a href="Model.html">Model</a></li></ul></div>
+                
+            </nav>
+        </div>
+        <div class="core" id="main-content-wrapper">
+            <div class="content">
+                <header class="page-title">
+                    <p>Source</p>
+                    <h1>model.js</h1>
+                </header>
+                
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/* eslint-disable valid-jsdoc */
 /* eslint-disable max-len */
 /* eslint-disable require-jsdoc */
 'use strict'
@@ -39,7 +126,7 @@ const internals = {
 }
 
 const whereConvert = function(args, model) {
-  if (args && args.length === 1 && typeof args[0] === 'object' && Object.keys(args[0]).length) {
+  if (args &amp;&amp; args.length === 1 &amp;&amp; typeof args[0] === 'object' &amp;&amp; Object.keys(args[0]).length) {
     args = args[0]
     const opts = []
     let s = Object.keys(args).filter((el) => el !== '_sql').map((el) => {
@@ -50,7 +137,7 @@ const whereConvert = function(args, model) {
       }
       return Array.isArray(val) ? `${el} IN ?` : `${el} = ?`
     })
-    if (Array.isArray(args._sql) && args._sql[0]) {
+    if (Array.isArray(args._sql) &amp;&amp; args._sql[0]) {
       s = s.concat(args._sql)
     }
     opts.unshift(s.join(' AND '))
@@ -120,11 +207,11 @@ class Model {
 
 
     if (cfg.oldMode || cfg.raw) {
-      cfg.debug && console.log(this.table, ' DO NOT used data cb callback')
+      cfg.debug &amp;&amp; console.log(this.table, ' DO NOT used data cb callback')
       this.setProcessDataCallback = false
     } else {
       const me = this
-      cfg.debug && console.log(this.table, ' used data cb callback, cfg: ', cfg)
+      cfg.debug &amp;&amp; console.log(this.table, ' used data cb callback, cfg: ', cfg)
       this.setProcessDataCallback(function(rows) {
         if (Array.isArray(rows)) {
           return rows.map((row) => {
@@ -170,8 +257,8 @@ class Model {
    * @param {Boolean} cfg.raw return raw objects or Record instances
    * @param {String} dbname set database. ***database*** name will be used as a key to get the mysql configuration. if only one configuration connection then database is optional parameter
    * @returns {Function} will return new instance of Model
-   * @desc Model.create is preferable way to use Model.<br />
-   * Method will get a function that always return a new Model instance!<br />
+   * @desc Model.create is preferable way to use Model.&lt;br />
+   * Method will get a function that always return a new Model instance!&lt;br />
    * it's garanteed what your previous request will not be able to influence the new request
    * @example const itemsModel = Model.create('items')
    * function getItems = (ids) => itemsModel().find().where('id IN ?', ids).do()
@@ -201,7 +288,7 @@ class Model {
       // return array of numbered fields, for example fi('cp', 3, 0) will return ['cp0', 'cp1', 'cp2']
       fi: (f, n, st = 1) => {
         const res = []
-        for (let i = 0; i < n; i++) {
+        for (let i = 0; i &lt; n; i++) {
           res.push(f + (st + i).toString())
         }
         return res
@@ -267,7 +354,7 @@ class Model {
  */
   _setupGlobalListeners() {
     const _events = internals.events.get(this.table)
-    if (typeof _events === 'object' && Object.keys(_events).length) {
+    if (typeof _events === 'object' &amp;&amp; Object.keys(_events).length) {
       Object.keys(_events).forEach((event) => {
         const handler = typeof _events[event] === 'function' ? _events[event] : _events[event].handler
         const scope = _events[event].scope
@@ -320,9 +407,9 @@ class Model {
   }
   /**
  * @static
- * @param cfg {Object|Array} can be Object or Array of Objects if used multi-db configurations.<br />
- * in multi-db config you should mark one db as default or define database name in each Model instance<br/>
- * elsewhere will be used first config in array mysql2 connnection config, https://github.com/sidorares/node-mysql2/blob/master/lib/connection_config.js<br />
+ * @param cfg {Object|Array} can be Object or Array of Objects if used multi-db configurations.&lt;br />
+ * in multi-db config you should mark one db as default or define database name in each Model instance&lt;br/>
+ * elsewhere will be used first config in array mysql2 connnection config, https://github.com/sidorares/node-mysql2/blob/master/lib/connection_config.js&lt;br />
  * config.default {Boolean} set database config as default in multi-db configuration
  * @example
  * Model.setConfig([
@@ -340,7 +427,7 @@ class Model {
     Object.keys(cfg).forEach((key) => {
       const defaultDb = cfg[key]
       delete cfg[key].default
-      if (cfg[key] && cfg[key].database && cfg[key].database.length) {
+      if (cfg[key] &amp;&amp; cfg[key].database &amp;&amp; cfg[key].database.length) {
         internals.db_config[cfg[key].database] = cfg[key]
         if (!internals.default_db_name) {
           if (defaultDb) {
@@ -390,14 +477,14 @@ class Model {
       console.error('error get db connection')
       throw new Error('error get db connection')
     }
-    await this.base.doConn(conn, 'BEGIN;').then((res) => debug && console.log('BEGIN;', res))
+    await this.base.doConn(conn, 'BEGIN;').then((res) => debug &amp;&amp; console.log('BEGIN;', res))
     const data = await this.base.doConn(conn, {sql: params.text, values: params.values}).catch((ex) => {
       console.error('error _doRequest : %s\n', JSON.stringify(params), JSON.stringify(ex))
-      this.base.doConn('ROLLBACK;').then((res) => debug && console.log('ROLLBACK;', res))
+      this.base.doConn('ROLLBACK;').then((res) => debug &amp;&amp; console.log('ROLLBACK;', res))
       conn.release()
       throw ex
     })
-    await this.base.doConn(conn, 'COMMIT;').then((res) => debug && console.log('COMMIT;', res))
+    await this.base.doConn(conn, 'COMMIT;').then((res) => debug &amp;&amp; console.log('COMMIT;', res))
     const handler = internals.eventHandlers.get(this.action)
     if (handler) {
       handler(this)
@@ -416,12 +503,12 @@ class Model {
   }
 
   _needWrap(opts) {
-    return this._processFn && !opts.raw && !this._raw
+    return this._processFn &amp;&amp; !opts.raw &amp;&amp; !this._raw
   }
 
   async _doRequest(params) {
     // this.consoleDebug(this.getOpMode())
-    this.debug && console.log('_doRequest params:', params)
+    this.debug &amp;&amp; console.log('_doRequest params:', params)
     params.sql = params.sql || params.text
     const data = await this.base.do(params).catch((ex) => {
       console.error('error _doRequest : %s\n', JSON.stringify(params), JSON.stringify(ex))
@@ -442,7 +529,7 @@ class Model {
 
   async doPage(opts = {}) {
     this._addOpMode('doPage', opts)
-    if (Number.isSafeInteger(opts.offset) && Number.isSafeInteger(opts.limit)) {
+    if (Number.isSafeInteger(opts.offset) &amp;&amp; Number.isSafeInteger(opts.limit)) {
       opts.page = Math.round(opts.offset / opts.limit) + 1
     }
     if (opts.page) {
@@ -519,7 +606,7 @@ class Model {
         }
       }
       // return newly created record as Record instance
-      if (this.opMode === 'insert' && data.insertId) {
+      if (this.opMode === 'insert' &amp;&amp; data.insertId) {
         return this.find().where('id = ?', data.insertId).first()
       }
       return data
@@ -559,16 +646,10 @@ class Model {
     return this
   }
 
-  /**
-   * 
-   * @param {*} table 
-   * @param {*} fields 
-   * @returns 
-   */
-  find(fields) {
-    this._setOpMode('find', fields)
-    // fields = fields || '*'
-    if (typeof table === 'object' && table.fields && table.fields.length) {
+  find(table, fields) {
+    this._setOpMode('find', table, fields)
+    fields = fields || '*'
+    if (typeof table === 'object' &amp;&amp; table.fields &amp;&amp; table.fields.length) {
       if (Array.isArray(table.fields)) {
         table.fields = table.fields.map((f) => this.table + '.' + f).join(',')
       }
@@ -583,7 +664,7 @@ class Model {
   update(data) {
     this._setOpMode('update', data)
     this.query = this.Q.update().table(this.table)
-    if (data && typeof data === 'object' && Object.keys(data).length) {
+    if (data &amp;&amp; typeof data === 'object' &amp;&amp; Object.keys(data).length) {
       this.setFields(data)
     }
     this.action = 'update'
@@ -594,7 +675,7 @@ class Model {
   insert(data) {
     this._setOpMode('insert', data)
     this.query = this.Q.insert().into(this.table)
-    if (data && typeof data === 'object' && Object.keys(data).length) {
+    if (data &amp;&amp; typeof data === 'object' &amp;&amp; Object.keys(data).length) {
       this.setFields(data)
     }
     this.action = 'insert'
@@ -623,7 +704,7 @@ class Model {
       offset = opts.offset
     }
     this._addOpMode('page', page, pageSize)
-    if (page < 1) page = 1
+    if (page &lt; 1) page = 1
     this.paginate = {
       page: page,
       offset: offset || ((page - 1) * pageSize),
@@ -849,7 +930,7 @@ class Model {
       internals.withOptions[this.table][scope] = arg[0]
       return this
     }
-    const fn = internals.withOptions[this.table] && internals.withOptions[this.table][scope]
+    const fn = internals.withOptions[this.table] &amp;&amp; internals.withOptions[this.table][scope]
     if (fn) {
       arg = arg || []
       arg.unshift(this)
@@ -866,7 +947,7 @@ class Model {
  */
 
   withOther(table, scope, ...arg) {
-    const fn = internals.withOptions[table] && internals.withOptions[table][scope]
+    const fn = internals.withOptions[table] &amp;&amp; internals.withOptions[table][scope]
     if (fn) {
       arg = arg || []
       arg.unshift(this)
@@ -884,3 +965,32 @@ class Model {
 }
 
 module.exports = Model
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+            </div>
+            
+            <footer class="footer">
+                <div class="content has-text-centered">
+                    <p>Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.6</a></p>
+                    <p class="sidebar-created-by">
+                        <a href="https://github.com/SoftwareBrothers/better-docs" target="_blank">BetterDocs theme</a> provided with <i class="fas fa-heart"></i> by 
+                        <a href="http://softwarebrothers.co" target="_blank">SoftwareBrothers - JavaScript Development Agency</a>
+                    </p>
+                </div>
+            </footer>
+            
+        </div>
+        <div id="side-nav" class="side-nav">
+        </div>
+    </div>
+<script src="scripts/app.min.js"></script>
+<script>PR.prettyPrint();</script>
+<script src="scripts/linenumber.js"> </script>
+
+</body>
+</html>

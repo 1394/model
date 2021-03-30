@@ -29,7 +29,9 @@
     "pluralize": "^3.0.0"
   },
   "devDependencies": {
+    "better-docs": "^2.3.2",
     "eslint": "^7.14.0",
-    "eslint-config-google": "^0.14.0"
+    "eslint-config-google": "^0.14.0",
+    "jsdoc": "^3.6.6"
   }
 }

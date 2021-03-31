@@ -1389,7 +1389,7 @@ const tbl2Model = Model.create('table2', {db: 'db1'}) // database set as 'db1'</
         <p class="tag-source">
             <a href="model.js.html" class="button">View Source</a>
             <span>
-                <a href="model.js.html">model.js</a>, <a href="model.js.html#line783">line 783</a>
+                <a href="model.js.html">model.js</a>, <a href="model.js.html#line797">line 797</a>
             </span>
         </p>
     
@@ -2356,6 +2356,349 @@ const tbl2Model = Model.create('table2', {db: 'db1'}) // database set as 'db1'</
 
 
     
+    <h4 class="name" id="find">
+        <a class="href-link" href="#find">#</a>
+        
+        <span class="code-name">
+            
+                find<span class="signature">(fields)</span><span class="type-signature"> &rarr; {<a href="Model.html">Model</a>}</span>
+            
+        </span>
+    </h4>
+    
+
+    
+    
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+<div class="table-container">
+    <table class="params table">
+        <thead>
+        <tr>
+            
+            <th>Name</th>
+            
+
+            <th>Type</th>
+
+            
+
+            
+
+            <th class="last">Description</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        
+
+            
+<tr class="deep-level-0">
+  
+      <td class="name"><code>fields</code></td>
+  
+
+  <td class="type">
+  
+      
+<span class="param-type">Array</span>
+
+
+  
+  </td>
+
+  
+
+  
+
+  <td class="description last"><p>table field array. no need to use 'table.field', just field name</p></td>
+</tr>
+
+
+        
+        </tbody>
+    </table>
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    
+
+    
+
+    
+
+    
+        <p class="tag-source">
+            <a href="model.js.html" class="button">View Source</a>
+            <span>
+                <a href="model.js.html">model.js</a>, <a href="model.js.html#line567">line 567</a>
+            </span>
+        </p>
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div class='columns method-parameter'>
+        <div class="column is-2"><label>Returns:</label></div>
+        <div class="column is-10">
+            
+                    
+
+<div class="columns">
+    
+    
+    <div class='column is-5 has-text-left'>
+        <label>Type: </label>
+        
+<span class="param-type"><a href="Model.html">Model</a></span>
+
+
+    </div>
+    
+</div>
+
+                
+        </div>
+    </div>
+
+
+
+
+</div>
+            
+                <div class="member">
+
+
+    
+    <h4 class="name" id="from">
+        <a class="href-link" href="#from">#</a>
+        
+        <span class="code-name">
+            
+                from<span class="signature">(fields)</span><span class="type-signature"> &rarr; {<a href="Model.html">Model</a>}</span>
+            
+        </span>
+    </h4>
+    
+
+    
+    
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+<div class="table-container">
+    <table class="params table">
+        <thead>
+        <tr>
+            
+            <th>Name</th>
+            
+
+            <th>Type</th>
+
+            
+
+            
+
+            <th class="last">Description</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        
+
+            
+<tr class="deep-level-0">
+  
+      <td class="name"><code>fields</code></td>
+  
+
+  <td class="type">
+  
+      
+<span class="param-type">Array</span>
+
+
+  
+  </td>
+
+  
+
+  
+
+  <td class="description last"><p>add extra tables in FROM section</p></td>
+</tr>
+
+
+        
+        </tbody>
+    </table>
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    
+
+    
+
+    
+
+    
+        <p class="tag-source">
+            <a href="model.js.html" class="button">View Source</a>
+            <span>
+                <a href="model.js.html">model.js</a>, <a href="model.js.html#line586">line 586</a>
+            </span>
+        </p>
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div class='columns method-parameter'>
+        <div class="column is-2"><label>Returns:</label></div>
+        <div class="column is-10">
+            
+                    
+
+<div class="columns">
+    
+    
+    <div class='column is-5 has-text-left'>
+        <label>Type: </label>
+        
+<span class="param-type"><a href="Model.html">Model</a></span>
+
+
+    </div>
+    
+</div>
+
+                
+        </div>
+    </div>
+
+
+
+
+    <h5>Example</h5>
+    
+    
+        <pre class="prettyprint"><code>const itemsModel = Model.create('items')
+itemsModel().from('protos') // SELECT items.* FROM items, protos
+itemsModel().from('items AS refItems') // SELECT items.* FROM items, items AS refItems</code></pre>
+    
+
+
+</div>
+            
+                <div class="member">
+
+
+    
     <h4 class="name" id="getOpMode">
         <a class="href-link" href="#getOpMode">#</a>
         
@@ -2862,7 +3205,7 @@ const tbl2Model = Model.create('table2', {db: 'db1'}) // database set as 'db1'</
         <p class="tag-source">
             <a href="model.js.html" class="button">View Source</a>
             <span>
-                <a href="model.js.html">model.js</a>, <a href="model.js.html#line840">line 840</a>
+                <a href="model.js.html">model.js</a>, <a href="model.js.html#line854">line 854</a>
             </span>
         </p>
     
@@ -3099,7 +3442,7 @@ const tbl2Model = Model.create('table2', {db: 'db1'}) // database set as 'db1'</
         <p class="tag-source">
             <a href="model.js.html" class="button">View Source</a>
             <span>
-                <a href="model.js.html">model.js</a>, <a href="model.js.html#line862">line 862</a>
+                <a href="model.js.html">model.js</a>, <a href="model.js.html#line876">line 876</a>
             </span>
         </p>
     

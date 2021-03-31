@@ -251,8 +251,8 @@ class Model {
  */
   /**
    * @static
-   * @param {*} table 
-   * @param {Object} cfg 
+   * @param {*} table
+   * @param {Object} cfg
    * @param {String} cfg.db set database, if not defined, then the first database or with "default" flag from the configuration passed to the setConfig method is used
    * @param {Boolean} cfg.raw return raw objects or Record instances
    * @param {String} dbname set database. ***database*** name will be used as a key to get the mysql configuration. if only one configuration connection then database is optional parameter
@@ -646,19 +646,33 @@ class Model {
     return this
   }
 
-  find(table, fields) {
-    this._setOpMode('find', table, fields)
-    fields = fields || '*'
-    if (typeof table === 'object' &amp;&amp; table.fields &amp;&amp; table.fields.length) {
-      if (Array.isArray(table.fields)) {
-        table.fields = table.fields.map((f) => this.table + '.' + f).join(',')
-      }
-      this.query = this.Q.select().from(this.table).field(table.fields)
-      return this
+  /**
+   *
+   * @param {Array} fields table field array. no need to use 'table.field', just field name
+   * @return {Model}
+   */
+  find(fields) {
+    this._setOpMode('find', fields)
+    if (Array.isArray(fields) &amp;&amp; fields.length) {
+      fields = fields.map((f) => this.table + '.' + f).join(',')
     } else {
-      this.query = table ? this.query.from(table).field(table + '.' + fields) : this.Q.select().from(this.table).field(this.table + '.' + fields)
-      return this
+      fields = `${this.table}.*`
     }
+    this.query = this.Q.select().from(this.table).field(fields)
+  }
+
+  /**
+   *
+   * @param {Array} fields add extra tables in FROM section
+   * @return {Model}
+   * @example
+   * const itemsModel = Model.create('items')
+   * itemsModel().from('protos') // SELECT items.* FROM items, protos
+   * itemsModel().from('items AS refItems') // SELECT items.* FROM items, items AS refItems
+   */
+  from(tables) {
+    this._setOpMode('from', tables)
+    this.query = this.Q.select().extraFrom(tables)
   }
 
   update(data) {

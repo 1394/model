@@ -92,23 +92,15 @@ class Model {
     this._setupGlobalListeners()// must be set table before call!!!
     this.dbConfig = internals.db_config[this.dbname]
     this.Q = new Query()
-    // this.Q.registerValueHandler(Date, (d) => {
-    //   return d;
-    // });
     this.df = require('dateformat')
     this.df.i18n = internals.i18n
     this.strftime = function(v, format) {
       return this.df(v, format || 'dd-mmmm-yyyy HH:MM')
     }
-    // this.Q.useFlavour('mysql');
-
     const DbService = require('./lib/dbservice')
     this.base = new DbService(this.dbConfig, this.modelConfig.debug, {serviceConn: this.modelConfig.serviceConn})
-
     this.logs = []
-
     this._resetModel()
-
     this.showLog = function(e, ...args) {
       args.length ? this.logs.push(util.inspect(args), e) : this.showLog(e)
       console.log('\r\nError : ********************************************************')
@@ -116,10 +108,7 @@ class Model {
       console.log('****************************************************************\r\n')
     }.bind(this)
 
-    this.query = ''
-
-
-    if (cfg.oldMode || cfg.raw) {
+    if (cfg.raw) {
       cfg.debug && console.log(this.table, ' DO NOT used data cb callback')
       this.setProcessDataCallback = false
     } else {
@@ -164,8 +153,8 @@ class Model {
  */
   /**
    * @static
-   * @param {*} table 
-   * @param {Object} cfg 
+   * @param {*} table
+   * @param {Object} cfg
    * @param {String} cfg.db set database, if not defined, then the first database or with "default" flag from the configuration passed to the setConfig method is used
    * @param {Boolean} cfg.raw return raw objects or Record instances
    * @param {String} dbname set database. ***database*** name will be used as a key to get the mysql configuration. if only one configuration connection then database is optional parameter
@@ -214,6 +203,8 @@ class Model {
  * @memberof Model
  */
   _resetModel() {
+    this.Q = new Query()
+    this.query = this.Q.table(this.table)
     this.paginate = false
     this.opMode = 'afterReset'
     this.action = ''
@@ -560,24 +551,34 @@ class Model {
   }
 
   /**
-   * 
-   * @param {*} table 
-   * @param {*} fields 
-   * @returns 
+   *
+   * @param {Array} fields table field array. no need to use 'table.field', just field name
+   * @return {Model}
    */
   find(fields) {
     this._setOpMode('find', fields)
-    // fields = fields || '*'
-    if (typeof table === 'object' && table.fields && table.fields.length) {
-      if (Array.isArray(table.fields)) {
-        table.fields = table.fields.map((f) => this.table + '.' + f).join(',')
-      }
-      this.query = this.Q.select().from(this.table).field(table.fields)
-      return this
+    if (Array.isArray(fields) && fields.length) {
+      fields = fields.map((f) => this.table + '.' + f)
     } else {
-      this.query = table ? this.query.from(table).field(table + '.' + fields) : this.Q.select().from(this.table).field(this.table + '.' + fields)
-      return this
+      fields = `${this.table}.*`
     }
+    this.query = this.query.select().from(this.table, fields)
+    return this
+  }
+
+  /**
+   *
+   * @param {Array} fields add extra tables in FROM section
+   * @return {Model}
+   * @example
+   * const itemsModel = Model.create('items')
+   * itemsModel().from('protos') // SELECT items.* FROM items, protos
+   * itemsModel().from('items AS refItems') // SELECT items.* FROM items, items AS refItems
+   */
+  from(tables) {
+    this._setOpMode('from', tables)
+    this.query = this.Q.select().extraFrom(tables)
+    return this
   }
 
   update(data) {

@@ -8,7 +8,9 @@
   ],
   "main": "model.js",
   "scripts": {
-    "test": "node tests/test.js"
+    "testQuery": "node tests/test_query.js",
+    "testModel": "node tests/test_model.js",
+    "test": "npm run testQuery && npm run testModel"
   },
   "repository": {
     "type": "git",

@@ -364,10 +364,10 @@ class Model {
  * @param {String} event
  * @param {Function} handler after event handler will call with args : Model instance, request params, returned operation data
  * @param {Object} scope
- * @memberof Model
  */
   on(event, handler, scope) {
     this.eventProxy.addEventHandler(this.table, event, handler, scope || this)
+    return this
   }
 
   getListener(event) {
@@ -484,11 +484,6 @@ class Model {
       return this.doPage(opts)
     }
 
-    if (opts.debug) {
-      // console.log('\n do local debug message:')
-      // cconsole.log(opts.debug, this.query.toString())
-      // cconsole.log('reset', '\n')
-    }
     let data
     try {
       const params = this.query.toParam()
@@ -519,10 +514,6 @@ class Model {
       console.error(ex.stack)
       throw ex
     }
-  }
-
-  doFirst() {
-    return this.first()
   }
 
   one(...whereArgs) {
@@ -562,7 +553,7 @@ class Model {
     } else {
       fields = `${this.table}.*`
     }
-    this.query = this.query.select().from(this.table, fields)
+    this.query.select(this.table, fields)
     return this
   }
 
@@ -576,14 +567,14 @@ class Model {
    * itemsModel().from('items AS refItems') // SELECT items.* FROM items, items AS refItems
    */
   from(tables) {
-    this._setOpMode('from', tables)
-    this.query = this.Q.select().extraFrom(tables)
+    // this._setOpMode('from', tables)
+    this.query.extraFrom(tables)
     return this
   }
 
   update(data) {
     this._setOpMode('update', data)
-    this.query = this.Q.update().table(this.table)
+    this.query = this.Q.update(this.table)
     if (data && typeof data === 'object' && Object.keys(data).length) {
       this.setFields(data)
     }
@@ -594,7 +585,7 @@ class Model {
 
   insert(data) {
     this._setOpMode('insert', data)
-    this.query = this.Q.insert().into(this.table)
+    this.query = this.Q.insert(this.table)
     if (data && typeof data === 'object' && Object.keys(data).length) {
       this.setFields(data)
     }
@@ -605,7 +596,7 @@ class Model {
 
   delete() {
     this._setOpMode('delete')
-    this.query = this.Q.delete().from(this.table)
+    this.query = this.Q.delete(this.table)
     this.action = 'delete'
     this.actionData = []
     return this
@@ -648,7 +639,7 @@ class Model {
       this.find()
     }
     this._addOpMode('outer_join', table, where, alias)
-    this.query = this.query.join(table, alias, where, 'OUTER')
+    this.query = this.query.join(table, where, 'OUTER', alias)
     this.actionData.push({outer_join: [table, where, alias]})
     return this
   }
@@ -658,7 +649,7 @@ class Model {
       this.find()
     }
     this._addOpMode('left_outer_join', table, where, alias)
-    this.query = this.query.join(table, alias, where, 'LEFT OUTER')
+    this.query = this.query.join(table, where, 'LEFT OUTER', alias)
     this.actionData.push({left_outer_join: [table, where, alias]})
     return this
   }
@@ -668,14 +659,14 @@ class Model {
       this.find()
     }
     this._addOpMode('left_join', table, where, alias)
-    this.query = this.query.join(table, alias, where, 'LEFT')
+    this.query = this.query.join(table, where, 'LEFT', alias)
     this.actionData.push({left_join: [table, where, alias]})
     return this
   }
 
-  distinct() {
-    this._addOpMode('distinct')
-    this.query = this.query.distinct()
+  distinct(field) {
+    this._addOpMode('distinct', field)
+    this.query = this.query.field(`DISTINCT ${field}`)
     return this
   }
 
@@ -694,21 +685,26 @@ class Model {
     return this
   }
 
-  setFields(opts) {
-    this._addOpMode('setFields', opts)
-    if (typeof opts === 'string') {
-      this.query.set(opts)
+  setFields(fields) {
+    this._addOpMode('setFields', fields)
+    if (this.getOpMode() === 'update') {
+      this.query.updateFields(fields)
       return this
     }
-    Object.keys(opts || {}).forEach((k) => {
-      const escaped = '`' + this.table + '`.`' + k + '`'
-      this.query.set(escaped, opts[k])
-    })
-    return this
+    if (this.getOpMode() === 'insert') {
+      this.query.insertFields(fields)
+      return this
+    }
+    throw new Error('setFields used only in :insert OR :update mode')
+    // Object.keys(opts || {}).forEach((k) => {
+    //   const escaped = '`' + this.table + '`.`' + k + '`'
+    //   this.query.set(escaped, opts[k])
+    // })
   }
 
   set(opts) {
-    return this.setFields(opts)
+    throw new Error('Model.set deprecated!')
+    // return this.setFields(opts)
   }
 
   limit(opts) {
@@ -772,8 +768,9 @@ class Model {
   }
 
   setKV(k, v) {
-    this.query = this.query.set(this._wrapField(k), v)
-    return this
+    throw new Error('Model.set deprecated!')
+    // this.query = this.query.set(this._wrapField(k), v)
+    // return this
   }
 
   debugLog(fn) {
@@ -801,19 +798,19 @@ class Model {
 */
   upsert(...opts) {
     const fieldsData = opts.shift()
-
-    return this.find().where(...opts).doFirst()
+    const model = Model.create(this.table)
+    return this.find().where(...opts).one()
       .then((rec) => {
         if (rec) {
-          return this.update().where(...opts).setFields(fieldsData).do()
+          return model().update().where(...opts).setFields(fieldsData).do()
         } else {
-          return this.insert().setFields(fieldsData).do()
+          return model().insert().setFields(fieldsData).do()
         }
       })
   }
 
   findBy(field, values) {
-    this._resetModel().find().where(`${this._wrapField(field)} ${Array.isArray(values) ? 'IN' : '='} ?`, values)
+    this.find().where(`${this._wrapField(field)} ${Array.isArray(values) ? 'IN' : '='} ?`, values)
     return this
   }
 

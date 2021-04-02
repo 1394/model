@@ -11,6 +11,23 @@ assert.strictEqual(
   itemsModel().find(['id', 'name']).from('protos').query.toString(),
   'SELECT items.id,items.name FROM items, protos'
 )
+// WHERE IN
+assert.strictEqual(
+  itemsModel()
+    .find(['id', 'name'])
+    .where('id IN ?', ['123', '1234fdf'])
+    .query.toString(),
+  'SELECT items.id,items.name FROM items, protos'
+)
+// ORDER BY
+assert.strictEqual(
+  itemsModel()
+    .find(['id', 'name'])
+    .order('items.id')
+    .order('items.name', 'DESC')
+    .query.toString(),
+  'SELECT items.id,items.name FROM items, protos'
+)
 // JOIN / FIELD
 assert.strictEqual(
   itemsModel()
@@ -35,4 +52,3 @@ assert.strictEqual(
   itemsModel().update().where('id IN ?', [21, 345]).setFields({name: 'name', proto_id: 2}).query.toString(),
   'UPDATE `items` SET name = \'name\',proto_id = 2 WHERE id IN (21,345)'
 )
-

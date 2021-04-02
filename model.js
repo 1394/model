@@ -411,11 +411,11 @@ class Model {
   }
 
   async _doRequest(params) {
-    // this.consoleDebug(this.getOpMode())
-    this.debug && console.log('_doRequest params:', params)
-    params.sql = params.sql || params.text
-    const data = await this.base.do(params).catch((ex) => {
-      console.error('error _doRequest : %s\n', JSON.stringify(params), JSON.stringify(ex))
+    const sql = params.toString()
+    this.debug && console.log('_doRequest params:', sql)
+    // params.sql = params.sql || params.text
+    const data = await this.base.do(sql).catch((ex) => {
+      console.error('error _doRequest : %s\n', sql, JSON.stringify(ex))
       throw ex
     })
     const handler = internals.eventHandlers.get(this.action)
@@ -447,9 +447,12 @@ class Model {
     }
     try {
       const result = {paginate: true}
+      const countSql = this.query.clone()
+      countSql._set('fields', `COUNT(${this.table}.id) AS count`)
+      const {count} = await this.base.do(countSql.toString())
       const paramsQuery = this.query.limit(this.paginate.limit).offset(this.paginate.offset).toParam()
-      paramsQuery.foundRows = this.table
-      const {rows: data, count} = await this._doRequest(paramsQuery).catch((ex) => {
+      // paramsQuery.foundRows = this.table
+      const {rows: data} = await this._doRequest(paramsQuery).catch((ex) => {
         console.error(ex); throw ex
       })
       result.count = count

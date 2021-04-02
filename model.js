@@ -546,7 +546,18 @@ class Model {
    * @param {Array} fields table field array. no need to use 'table.field', just field name
    * @return {Model}
    */
-  find(fields) {
+  find(...args) {
+    let [fields, opts] = args
+    if ((!fields || typeof fields === 'string') && Array.isArray(opts)) {
+      fields = opts
+      console.error('Model.find("tableName", ["field1", "field2"]) is deprecated and will be removed in next releases')
+      console.error('use Model.find(["field1", "field2"]) instead!')
+    }
+    if (typeof fields === 'object' && Array.isArray(fields.fields)) {
+      fields = fields.fields
+      console.error('Model.find({fields: ["field1", "field2"]}) is deprecated and will be removed in next releases')
+      console.error('use Model.find(["field1", "field2"]) instead!')
+    }
     this._setOpMode('find', fields)
     if (Array.isArray(fields) && fields.length) {
       fields = fields.map((f) => this.table + '.' + f)

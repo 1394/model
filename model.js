@@ -449,11 +449,19 @@ class Model {
       const result = {paginate: true}
       const countSql = this.query.clone()
       countSql._set('fields', `COUNT(${this.table}.id) AS count`)
-      const {count} = await this.base.do(countSql.toString())
-      const paramsQuery = this.query.limit(this.paginate.limit).offset(this.paginate.offset).toParam()
-      // paramsQuery.foundRows = this.table
-      const {rows: data} = await this._doRequest(paramsQuery).catch((ex) => {
-        console.error(ex); throw ex
+      const count = await this.base.do(countSql.toString())
+        .then((data) => {
+          return data[0] && data[0].count
+        })
+        .catch((error) => {
+          console.error('doPage calculate count error: ', error)
+          throw error
+        })
+      const paramsQuery = this.query.limit(this.paginate.limit).offset(this.paginate.offset)// .toParam()
+      const sql = paramsQuery.toString()
+      const data = await this.base.do(sql).catch((error) => {
+        console.error('doPage get rows error: ', error)
+        throw error
       })
       result.count = count
       result.pages = Math.ceil(result.count / this.paginate.limit)

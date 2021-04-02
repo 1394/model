@@ -46,7 +46,7 @@ assert.strictEqual(
 // INSERT
 assert.strictEqual(
   q().insert('items').insertFields({name: 'qwe', id: 2}).toString(),
-  'UPDATE `items` SET name = \'111\''
+  'INSERT INTO `items` (name,id) VALUES (\'qwe\',2)'
 )
 
 // DELETE

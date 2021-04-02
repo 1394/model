@@ -629,7 +629,7 @@ class Model {
       this.find()
     }
     this._addOpMode('join', table, where, alias)
-    this.query = this.query.join(table, alias, where)
+    this.query = this.query.join(table, where, 'JOIN', alias)
     this.actionData.push({join: [table, where, alias]})
     return this
   }

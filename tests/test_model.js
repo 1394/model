@@ -14,11 +14,11 @@ assert.strictEqual(
 // JOIN / FIELD
 assert.strictEqual(
   itemsModel()
-    .find(['id', 'name'])
+    .find()
     .join('protos', 'protos.id = items.proto_id')
     .field('protos.id AS protoName, protos.id AS pId')
     .query.toString(),
-  'SELECT items.id,items.name,protos.id AS protoName, protos.id AS pId FROM items JOIN protos ON protos.id = items.proto_id'
+  'SELECT items.*,protos.id AS protoName, protos.id AS pId FROM items JOIN protos ON protos.id = items.proto_id'
 )
 // SELECT DISTINCT
 assert.strictEqual(

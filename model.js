@@ -562,7 +562,7 @@ class Model {
     if (Array.isArray(fields) && fields.length) {
       fields = fields.map((f) => this.table + '.' + f)
     } else {
-      fields = `${this.table}.*`
+      fields = [`${this.table}.*`]
     }
     this.query.select(this.table, fields)
     return this

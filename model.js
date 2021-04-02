@@ -687,13 +687,14 @@ class Model {
   }
 
   fields(opts) {
-    this._addOpMode('fields', opts)
-    try {
-      this.query = this.query.fields(opts)
-    } catch (e) {
-      this.showLog(e, opts)
-    }
-    return this
+    throw new Error('Model.fields deprecated!')
+    // this._addOpMode('fields', opts)
+    // try {
+    //   this.query = this.query.fields(opts)
+    // } catch (e) {
+    //   this.showLog(e, opts)
+    // }
+    // return this
   }
 
   setFields(fields) {

@@ -171,7 +171,7 @@ class Record {
     return [...this._config().keys]
   }
   /**
- * @param {String} key may be one field name or array of fields
+ * @param {String} fieldName may be one field name or array of fields
  * @return {false|String} field if record has field, otherwise false
  * @memberof Record
  */

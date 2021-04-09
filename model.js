@@ -497,7 +497,7 @@ class Model {
 
     let data
     try {
-      const params = this.query.toParam()
+      const params = this.query
       data = await this._doRequest(params)
       const opMode = this.opMode
       this._resetModel()

@@ -325,7 +325,12 @@ class Model {
  */
   static setConfig(cfg) {
     console.log('actual Model2 version : ', internals.version)
-    if (!Array.isArray(cfg)) {
+
+    if (!cfg) {
+      throw new Error('Model.setConfig(undefined) will raise error!')
+    }
+
+    if (cfg && !Array.isArray(cfg)) {
       cfg = [cfg]
     }
 

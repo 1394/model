@@ -691,7 +691,7 @@ class Model {
 
   distinct(field) {
     this._addOpMode('distinct', field)
-    this.query = this.query.field(`DISTINCT ${field}`)
+    this.query = this.query.distinct(field)
     return this
   }
 

@@ -328,22 +328,20 @@ class Model {
     if (!Array.isArray(cfg)) {
       cfg = [cfg]
     }
-    Object.keys(cfg).forEach((key) => {
-      const defaultDb = cfg[key]
-      delete cfg[key].default
-      if (cfg[key] && cfg[key].database && cfg[key].database.length) {
-        internals.db_config[cfg[key].database] = cfg[key]
-        if (!internals.default_db_name) {
-          if (defaultDb) {
-            internals.default_db_name = cfg[key].database
-            console.log('set default_db_name to ', internals.default_db_name)
-          } else {
-            internals.default_db_name = cfg[Object.keys(cfg)[0]].database
-            console.log('set default_db_name to ', internals.default_db_name)
-          }
+
+    cfg.forEach((el) => {
+      if (el.database) {
+        const {database} = el
+        internals.db_config[database] = el
+        if (!internals.default_db_name && el.default) {
+          internals.default_db_name = database
+          console.log('set default_db_name to ', internals.default_db_name)
         }
       }
     })
+    if (!internals.default_db_name) {
+      internals.default_db_name = cfg[0].database
+    }
   }
 
   static getPool() {

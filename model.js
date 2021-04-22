@@ -451,6 +451,7 @@ class Model {
     try {
       const result = {paginate: true}
       const countSql = this.query.clone()
+      countSql.remove('order')
       countSql._set('fields', `COUNT(${this.table}.id) AS count`)
       const count = await this.base.do(countSql.toString())
         .then((data) => {

@@ -464,6 +464,7 @@ class Model {
       const paramsQuery = this.query.limit(this.paginate.limit).offset(this.paginate.offset)// .toParam()
       const sql = paramsQuery.toString()
       const data = await this.base.do(sql).catch((error) => {
+        console.info('errorSql:', sql)
         console.error('doPage get rows error: ', error)
         throw error
       })

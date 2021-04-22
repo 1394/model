@@ -751,17 +751,17 @@ class Model {
     if (this.getOpMode() === 'afterReset') {
       this.find()
     }
-    if (args.length === 1) {
-      const t = args[0].split(' ')
-      if (t.length === 2) {
-        args = t
-      }
-    }
-    if (args[1]) {
-      if (['asc', 'desc', 'ASC', 'DESC'].includes(args[1])) {
-        args[1] = !(args[1] === 'desc' || args[1] === 'DESC')
-      }
-    }
+    // if (args.length === 1) {
+    //   const t = args[0].split(' ')
+    //   if (t.length === 2) {
+    //     args = t
+    //   }
+    // }
+    // if (args[1]) {
+    //   if (['asc', 'desc', 'ASC', 'DESC'].includes(args[1])) {
+    //     args[1] = !(args[1] === 'desc' || args[1] === 'DESC')
+    //   }
+    // }
 
     this._addOpMode(...[].concat('order', args))
     this.query = this.query.order(...args)

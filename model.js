@@ -451,6 +451,7 @@ class Model {
     try {
       const result = {paginate: true}
       const countSql = this.query.clone()
+      countSql.remove('order')
       countSql._set('fields', `COUNT(${this.table}.id) AS count`)
       const count = await this.base.do(countSql.toString())
         .then((data) => {
@@ -463,6 +464,7 @@ class Model {
       const paramsQuery = this.query.limit(this.paginate.limit).offset(this.paginate.offset)// .toParam()
       const sql = paramsQuery.toString()
       const data = await this.base.do(sql).catch((error) => {
+        console.info('errorSql:', sql)
         console.error('doPage get rows error: ', error)
         throw error
       })
@@ -749,17 +751,17 @@ class Model {
     if (this.getOpMode() === 'afterReset') {
       this.find()
     }
-    if (args.length === 1) {
-      const t = args[0].split(' ')
-      if (t.length === 2) {
-        args = t
-      }
-    }
-    if (args[1]) {
-      if (['asc', 'desc', 'ASC', 'DESC'].includes(args[1])) {
-        args[1] = !(args[1] === 'desc' || args[1] === 'DESC')
-      }
-    }
+    // if (args.length === 1) {
+    //   const t = args[0].split(' ')
+    //   if (t.length === 2) {
+    //     args = t
+    //   }
+    // }
+    // if (args[1]) {
+    //   if (['asc', 'desc', 'ASC', 'DESC'].includes(args[1])) {
+    //     args[1] = !(args[1] === 'desc' || args[1] === 'DESC')
+    //   }
+    // }
 
     this._addOpMode(...[].concat('order', args))
     this.query = this.query.order(...args)

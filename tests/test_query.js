@@ -40,13 +40,19 @@ assert.strictEqual(
 // UPDATE
 assert.strictEqual(
   q().update('items').updateFields({name: '111'}).toString(),
-  'UPDATE `items` SET name = \'111\''
+  'UPDATE `items` SET `name` = \'111\''
 )
 
 // INSERT
 assert.strictEqual(
   q().insert('items').insertFields({name: 'qwe', id: 2}).toString(),
-  'INSERT INTO `items` (name,id) VALUES (\'qwe\',2)'
+  'INSERT INTO `items` (`name`,`id`) VALUES (\'qwe\',2)'
+)
+
+// INSERT DATE
+assert.strictEqual(
+  q().insert('items').insertFields({name: 'qwe', id: 2, created_at: new Date('2021-05-19 01:05:03')}).toString(),
+  'INSERT INTO `items` (`name`,`id`,`created_at`) VALUES (\'qwe\',2,\'2021-05-19 01:05:03\')'
 )
 
 // DELETE

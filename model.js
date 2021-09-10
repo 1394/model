@@ -452,8 +452,16 @@ class Model {
       const result = {paginate: true}
       const countSql = this.query.clone()
       countSql.remove('order')
-      countSql._set('fields', `COUNT(${this.table}.id) AS count`)
-      const count = await this.base.do(countSql.toString())
+      let countSqlString
+      if (countSql._get('group')) {
+        countSql._set('fields', `${this.table}.id AS aaa`)
+        countSqlString = `SELECT COUNT(*) FROM (${countSql.toString()}) AS countSqlString`
+      } else {
+        countSql._set('fields', `COUNT(${this.table}.id) AS count`)
+        countSqlString = countSql.toString()
+      }
+      this.debug && console.log({countSqlString})
+      const count = await this.base.do(countSqlString)
         .then((data) => {
           return data[0] && data[0].count
         })

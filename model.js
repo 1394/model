@@ -84,13 +84,13 @@ class Model {
     }
     this.modelConfig = cfg || {}
     this.table = table
-    this.dbname = dbname || cfg.db || internals.default_db_name
+    this.dbname = dbname || cfg.db || internals.default_db_name || (cfg.testOnly && 'test')
     if (!this.dbname) {
       console.log('default_db_name = ', internals.default_db_name)
       throw new Error('database must be marked as default or must expicitly define in model config')
     }
     this._setupGlobalListeners()// must be set table before call!!!
-    this.dbConfig = internals.db_config[this.dbname]
+    this.dbConfig = cfg.testOnly ? {testOnly: true} : internals.db_config[this.dbname]
     this.Q = new Query()
     this.df = require('dateformat')
     this.df.i18n = internals.i18n
@@ -280,8 +280,8 @@ class Model {
  */
   static setupListeners(table, events) {
     if (!events) {
-      Object.keys(table).forEach((key) => {
-        internals.events.set(key, table[key])
+      Object.entries(table).forEach((key, handler) => {
+        typeof handler === 'function' && internals.events.set(key, handler)
       })
     } else {
       internals.events.set(table, events)
@@ -416,7 +416,6 @@ class Model {
   async _doRequest(params) {
     const sql = params.toString()
     this.debug && console.log('_doRequest params:', sql)
-    // params.sql = params.sql || params.text
     const data = await this.base.do(sql).catch((ex) => {
       console.error('error _doRequest : %s\n', sql, JSON.stringify(ex))
       throw ex

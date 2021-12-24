@@ -25,15 +25,15 @@
   ],
   "homepage": "https://github.com/1394/model.git",
   "dependencies": {
-    "dateformat": "^1.0.12",
-    "glob": "^7.1.1",
-    "mysql2": "^1.6.1",
-    "pluralize": "^3.0.0"
+    "dateformat": "^5.0.2",
+    "glob": "^7.2.0",
+    "mysql2": "^2.3.3",
+    "pluralize": "^8.0.0"
   },
   "devDependencies": {
     "better-docs": "^2.3.2",
-    "eslint": "^7.14.0",
+    "eslint": "^8.5.0",
     "eslint-config-google": "^0.14.0",
-    "jsdoc": "^3.6.6"
+    "jsdoc": "^3.6.7"
   }
 }

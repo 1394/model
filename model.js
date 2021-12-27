@@ -92,7 +92,7 @@ class Model {
     this._setupGlobalListeners()// must be set table before call!!!
     this.dbConfig = cfg.testOnly ? {testOnly: true} : internals.db_config[this.dbname]
     this.Q = new Query()
-    this.df = require('dateformat')
+    this.df = require('./lib/dateformat')
     this.df.i18n = internals.i18n
     this.strftime = function(v, format) {
       return this.df(v, format || 'dd-mmmm-yyyy HH:MM')

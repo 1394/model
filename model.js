@@ -837,7 +837,15 @@ class Model {
     return this.find().where(...opts).one()
       .then((rec) => {
         if (rec) {
-          return model().update().where(...opts).setFields(fieldsData).do()
+          return model()
+            .update()
+            .where(...opts)
+            .setFields(fieldsData)
+            .do()
+            .then((result) => {
+              result.existedRecord = rec;
+              return result
+            })
         } else {
           return model().insert().setFields(fieldsData).do()
         }
